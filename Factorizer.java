@@ -238,15 +238,43 @@ public class Factorizer {
 			} 
 			int ni = (int) n.mod(BigInteger.valueOf(p)).longValue();
 			
-			for(int j = 0; j < p; j++) {
+			for(int j = 1; j < p; j++) {
 				int tmp = (j^2) % p;
-				if(tmp == ni)
-					factorBase.add(tmp);
+				if(tmp == ni) {
+					factorBase.add(p);
+					break;
+				}
+					
 			}
 			
 		}
 		
 		return factorBase;
+	}
+	
+	/*
+	 * Some weird legendre method found online, not sure if correct. Return legendre value
+	 * of a over p.
+	 */
+	public long mpmod(long a, long p) {
+		  long power = (p-1)/2;
+		  long result = 1;
+		  a = a % p;
+
+		  while (power > 0) {
+		    if ((power % 2) == 1) {
+		      result = (result * a) % p;
+		    }
+		    a = (a * a) % p;
+		    power = (long) Math.floor(power / 2);
+		  }
+
+		  if (result - p == -1)
+		    result = result - p;
+
+		  
+
+		  return (result);
 	}
 	
 }

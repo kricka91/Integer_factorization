@@ -60,6 +60,7 @@ public class Factorizer {
 		if (args.length > 0) {
 			try {
 				input = new BigInteger(args[0]);
+				
 				ArrayList<BigInteger> result = factorizer.factorize(input);
 				for (int i = 0;i<result.size();i++) {
 					System.out.println(result.get(i));
@@ -80,6 +81,8 @@ public class Factorizer {
 				System.err.println("Invalid number format.");
 				return;
 			}
+			//System.out.println(factorizer.longSqrt(input));
+			
 			ArrayList<BigInteger> result = factorizer.factorize(input);
 			for (int i = 0;i<result.size();i++) {
 				System.out.println(result.get(i));
@@ -174,10 +177,41 @@ public class Factorizer {
 	
 	/**
 	 * @return The integer square root (long) of the input value
+	 * 
+	 * Uses a binary search to find it. Complexity is O( b*log(n)*O(p(b,2)) ) where
+	 * n = size of integer to root
+	 * b = bits in n (== log(n))
+	 * O(p(b,2)) is the complexity of BigInteger.pow(2), a biginteger with b bits.
 	 */
 	private long longSqrt(BigInteger n) {
-		double d = n.doubleValue();
-		return (long)Math.sqrt(d);
+		BigInteger min = BigInteger.ONE;
+		BigInteger max = n;
+		
+		while(max.subtract(min).compareTo(BigInteger.ONE) == 1) {
+			BigInteger c = max.add(min).shiftRight(1);
+			BigInteger pow = c.pow(2);
+			int comp = pow.compareTo(n);
+			if(comp == 0) {
+				//they are equal
+				//found perfect square
+				return c.longValue();
+			} else if(comp == 1) {
+				//c^2 is greater than n
+				max = c.subtract(BigInteger.ONE);
+			} else {
+				min = c;
+			}
+		}
+		
+		//now we have a situation where max-min == 1 
+		if(max.pow(2).compareTo(n) < 1) {
+			return max.longValue();
+		} else {
+			return min.longValue();
+		}
+		
+		//double d = n.doubleValue();
+		//return (long)Math.sqrt(d);
 		//TODO Don't know if this is accurate enough
 	}
 	

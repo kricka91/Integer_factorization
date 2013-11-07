@@ -229,6 +229,12 @@ public class Factorizer {
 		//TODO Don't know if this is accurate enough
 	}
 	
+	/**
+	 * Get an arraylist of all primes p less than B which fulfill Legendre(n,p) == 1
+	 * @param n
+	 * @param B
+	 * @return
+	 */
 	public ArrayList<Integer> getLegendrePrimes(BigInteger n, int B) {
 		ArrayList<Integer> factorBase = new ArrayList<Integer>();
 		for(int i = 0; i < primes.length; i++) {
@@ -254,7 +260,7 @@ public class Factorizer {
 	
 	/*
 	 * Some weird legendre method found online, not sure if correct. Return legendre value
-	 * of a over p.
+	 * of a over p. Not used atm.
 	 */
 	public long mpmod(long a, long p) {
 		  long power = (p-1)/2;

@@ -11,6 +11,22 @@ public class Factorizer {
 	//Fields:
 	private ArrayList<Integer> smallPrimes;	//Hard coded primes
 	
+	//private final static int MAX_B = 500;
+	//private final static int MAX_M = 500;
+	
+	/* from http://primes.utm.edu/lists/small/1000.txt*/
+	int[] primes =  {2,  3,   5,      7  ,   11    , 13    , 17   ,  19  ,   23  ,   29 ,
+		     31  ,   37   ,  41   ,  43  ,   47   ,  53  ,   59 ,    61 ,    67  ,   71 ,
+		     73   ,  79  ,   83   ,  89   ,  97  ,  101   , 103  ,  107   , 109  ,  113 ,
+		    127  ,  131  ,  137  ,  139 ,   149  ,  151 ,  157  ,  163   , 167  ,  173 ,
+		    179   , 181  ,  191  ,  193  ,  197 ,   199 ,   211  ,  223 ,   227  ,  229 ,
+		    233   , 239 ,   241 ,   251  ,  257  , 263 ,  269   , 271  ,  277  ,  281 ,
+		    283   , 293   , 307  ,  311 ,   313  ,  317  ,  331 ,   337  ,  347  ,  349 ,
+		    353   , 359 ,   367 ,   373 ,   379  ,  383  ,  389   , 397 ,   401  ,  409 ,
+		    419   , 421 };
+	
+	private int B;
+	private int M;
 	
 	//Methods
 	/**
@@ -211,6 +227,26 @@ public class Factorizer {
 		//double d = n.doubleValue();
 		//return (long)Math.sqrt(d);
 		//TODO Don't know if this is accurate enough
+	}
+	
+	public ArrayList<Integer> getLegendrePrimes(BigInteger n, int B) {
+		ArrayList<Integer> factorBase = new ArrayList<Integer>();
+		for(int i = 0; i < primes.length; i++) {
+			int p = primes[i];
+			if(p > B) {
+				return factorBase;
+			} 
+			int ni = (int) n.mod(BigInteger.valueOf(p)).longValue();
+			
+			for(int j = 0; j < p; j++) {
+				int tmp = (j^2) % p;
+				if(tmp == ni)
+					factorBase.add(tmp);
+			}
+			
+		}
+		
+		return factorBase;
 	}
 	
 }

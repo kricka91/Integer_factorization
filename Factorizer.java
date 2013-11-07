@@ -170,9 +170,7 @@ public class Factorizer {
 	 * @return The integer square root (BigInteger) of the input value
 	 */
 	private BigInteger bigSqrt(BigInteger n) {
-		double d = n.doubleValue();
-		return BigInteger.valueOf((long)Math.sqrt(d));
-		//TODO Don't know if this is accurate enough
+		return BigInteger.valueOf(longSqrt(n));
 	}
 	
 	/**

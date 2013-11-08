@@ -245,7 +245,7 @@ public class Factorizer {
 			int ni = (int) n.mod(BigInteger.valueOf(p)).longValue();
 			
 			for(int j = 1; j < p; j++) {
-				int tmp = (j^2) % p;
+				int tmp = (j*j) % p;
 				if(tmp == ni) {
 					factorBase.add(p);
 					break;

@@ -81,7 +81,7 @@ public class Factorizer {
 				System.err.println("Invalid number format.");
 				return;
 			}
-			//System.out.println(factorizer.longSqrt(input));
+			System.out.println("Square root is: " + factorizer.longSqrt(input));
 			
 			ArrayList<BigInteger> result = factorizer.factorize(input);
 			for (int i = 0;i<result.size();i++) {
@@ -113,6 +113,15 @@ public class Factorizer {
 	 */
 	private ArrayList<BigInteger> factorizeQS(BigInteger input) {
 		//TODO
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		return null;
 	}
 	
@@ -182,8 +191,19 @@ public class Factorizer {
 	 * O(p(b,2)) is the complexity of BigInteger.pow(2), a biginteger with b bits.
 	 */
 	private long longSqrt(BigInteger n) {
+		/*
+		int numBits = n.bitLength();
+		int sqrtNumBits = numBits/2;	//Eller nåt sånt
+		BigInteger max = BigInteger.ONE.shiftLeft(sqrtNumBits+1);
+		BigInteger min = max.shiftRight(1);
+		System.err.println("Min and max are: " + min.toString() + " & " + max.toString());
+		System.err.println("Numbits and sqrtNumBits are: " + numBits + " & " + sqrtNumBits);
+		*/
+		
+		
 		BigInteger min = BigInteger.ONE;
 		BigInteger max = n;
+		
 		
 		while(max.subtract(min).compareTo(BigInteger.ONE) == 1) {
 			BigInteger c = max.add(min).shiftRight(1);

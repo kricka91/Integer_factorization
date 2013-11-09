@@ -319,6 +319,83 @@ public class Factorizer {
 		  return (result);
 	}
 	
+	public ArrayList<BitSet> findQs(ArrayList<ArrayList<Integer>> psols, long M, long sqrtn, BigInteger n) {
+		//initialize BitSet arraylist
+		ArrayList<BitSet> sols = new ArrayList<BitSet>();
+		final int EXTRA_Qs = 10;
+		
+		//for(int i = 0; i < psols.size() + EXTRA_Qs;i++) {
+			//sols.add(new BitSet(psols.size()+1)); //initialized to all zeros.
+		//}
+		
+		long interSizeHalf = 2500;
+		
+		//first interval
+		BigInteger inter_min = BigInteger.valueOf(sqrtn-interSizeHalf);
+		BigInteger inter_max = BigInteger.valueOf(sqrtn+interSizeHalf);
+		
+		ArrayList<QVectorElement> QVector = new ArrayList<QVectorElement>();
+		for(BigInteger i = inter_min; i.compareTo(inter_max) <= 0; i = i.add(BigInteger.ONE)) {
+			QVector.add(new QVectorElement(psols,i,n));
+		}
+		
+		
+		for(int i = 0; i < psols.size(); i++) {
+			ArrayList<Integer> psol = psols.get(i);
+			int p = psol.get(0);
+			BigInteger pbi = BigInteger.valueOf(p);
+			for(int j = 1; j < psol.size();j++) {
+				BigInteger x = BigInteger.valueOf(psol.get(j));
+				//now we have our x - put it at the beginning of the interval.
+				int comp = x.compareTo(inter_min);
+				if(comp == -1) {
+					//basic idea: k*p + r = inter_min   => k*p = inter_min-r
+					
+					// r = inter_min % p
+					BigInteger r = inter_min.mod(pbi);
+					
+					// k*p = inter_min-r
+					// k*p will always be smaller than or equal to inter_min
+					// however, smallest possible x is k*p+x
+					BigInteger mbi = inter_min.subtract(r).add(x); 
+					
+					//this may already be in the interval
+					//if it isnt, add p to it.
+					if(mbi.compareTo(inter_min) == -1) { //if still not enough
+						x = mbi.add(pbi);
+					} else {
+						x = mbi;
+					}
+				} else if(comp == 0){
+					//do nothing, x is already there!
+				} else {
+					//lower bound is smaller than current x
+					//similar thoughts as above. but now we seek x - k*p
+					//TODO
+				}
+				
+				while(x.compareTo(inter_max) <= 0) {
+					QVectorElement qve = QVector.get((int) x.subtract(inter_min).longValue());
+					if(qve.divideQWith(i)) {
+						sols.add(qve.getBitSet());
+						if(sols.size() == psols.size()+EXTRA_Qs) {
+							//RETURN!!!!!
+							return sols;
+						}
+					}
+					
+					x = x.add(pbi); //go to next x.
+				}
+				
+				
+			}
+		}
+		//couldnt find adequate Q-vector
+		
+		return null;
+	}
+	
+	
 }
 
 

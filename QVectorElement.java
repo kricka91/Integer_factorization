@@ -49,6 +49,11 @@ public class QVectorElement {
 			}
 		}
 		
+		if(numDivs == 0) {
+			//for debugging purposes
+			System.err.println("Q is divisible by p they said. There will be no remainder they said");
+		}
+		
 		if(numDivs%2 == 1) {
 			rep.set(index);
 		}

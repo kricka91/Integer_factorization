@@ -129,10 +129,18 @@ public class Factorizer {
 	 */
 	private ArrayList<BigInteger> factorizeQS(BigInteger input) {
 		//TODO
+		B = 500;
+		M = 1000000; //1 million
+		long sqrtn = longSqrt(input);
+		ArrayList<ArrayList<Integer>> factorBase = getLegendrePrimes(input,B);
+		ArrayList<BitSet> finalQs = findQs(factorBase,M,sqrtn,input);
+		BitSet[] Qarray = new BitSet[finalQs.size()];
+		for(int i = 0; i < finalQs.size(); i++) {
+			Qarray[i] = finalQs.get(i);
+		}
 		
-		
-		
-		
+		GaussEliminator ge = new GaussEliminator();
+		BitSet[] sol = ge.gaussEliminate(Qarray, Qarray.length, factorBase.size()+1);
 		
 		
 		

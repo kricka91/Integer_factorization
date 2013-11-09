@@ -250,27 +250,43 @@ public class Factorizer {
 	}
 	
 	/**
-	 * Get an arraylist of all primes p less than B which fulfill Legendre(n,p) == 1
+	 * Get an arraylist of arraylists. The inner arraylists' first element
+	 * is a prime p less than B which fulfill Legendre(n,p) == 1. All such primes have their
+	 * own inner arraylist. What follows is up to two different integers which are the solutions
+	 * to that equation.
 	 * @param n
 	 * @param B
 	 * @return
 	 */
-	public ArrayList<Integer> getLegendrePrimes(BigInteger n, int B) {
-		ArrayList<Integer> factorBase = new ArrayList<Integer>();
+	public ArrayList<ArrayList<Integer>> getLegendrePrimes(BigInteger n, int B) {
+		ArrayList<ArrayList<Integer>> factorBase = new ArrayList<ArrayList<Integer>>();
 		for(int i = 0; i < primes.length; i++) {
 			int p = primes[i];
 			if(p > B) {
 				return factorBase;
 			} 
 			int ni = (int) n.mod(BigInteger.valueOf(p)).longValue();
-			
+			ArrayList<Integer> psols = new ArrayList<Integer>();
+			int numFound = 0;
 			for(int j = 1; j < p; j++) {
 				int tmp = (j*j) % p;
 				if(tmp == ni) {
-					factorBase.add(p);
-					break;
+					if(psols.isEmpty())
+						psols.add(p);
+					
+					psols.add(j); //j is solution
+					numFound++;
+					//factorBase.add();
+					//break;
+					if(numFound == 2) {
+						break; //can only be two solutions.
+					}
 				}
 					
+			}
+			
+			if(!psols.isEmpty()) {
+				factorBase.add(psols);
 			}
 			
 		}

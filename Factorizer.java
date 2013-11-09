@@ -353,15 +353,16 @@ public class Factorizer {
 					BigInteger new_i_min = x.add(x.subtract(inter_min));
 					//now we can do the same!
 					BigInteger r = new_i_min.mod(pbi);
-					BigInteger mbi = new_i_min.subtract(r).add(x); 
+					BigInteger tmp = new_i_min.subtract(r);
+					BigInteger mbi = tmp.add(x); 
 					
 					BigInteger dist;
 					if(mbi.compareTo(new_i_min) == 1) { //if still not enough
-						dist = mbi.subtract(pbi);
+						dist = tmp.subtract(pbi);
 					} else {
-						dist = mbi;
+						dist = tmp;
 					}
-					x = x.subtract(dist.subtract(x));
+					x = x.subtract(dist);
 				}
 				
 				while(x.compareTo(inter_max) <= 0) {

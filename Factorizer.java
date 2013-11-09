@@ -306,10 +306,6 @@ public class Factorizer {
 		ArrayList<QVectorElement> sols = new ArrayList<QVectorElement>();
 		final int EXTRA_Qs = 10;
 		
-		//for(int i = 0; i < psols.size() + EXTRA_Qs;i++) {
-			//sols.add(new BitSet(psols.size()+1)); //initialized to all zeros.
-		//}
-		
 		long interSizeHalf = 2500;
 		
 		//first interval
@@ -353,7 +349,19 @@ public class Factorizer {
 				} else {
 					//lower bound is smaller than current x
 					//similar thoughts as above. but now we seek x - k*p
-					//TODO
+					//IDEA: move interval to the other side instead.
+					BigInteger new_i_min = x.add(x.subtract(inter_min));
+					//now we can do the same!
+					BigInteger r = new_i_min.mod(pbi);
+					BigInteger mbi = new_i_min.subtract(r).add(x); 
+					
+					BigInteger dist;
+					if(mbi.compareTo(new_i_min) == -1) { //if still not enough
+						dist = mbi;
+					} else {
+						dist = mbi.subtract(pbi);
+					}
+					x = x.subtract(dist);
 				}
 				
 				while(x.compareTo(inter_max) <= 0) {

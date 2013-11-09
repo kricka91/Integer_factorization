@@ -356,12 +356,12 @@ public class Factorizer {
 					BigInteger mbi = new_i_min.subtract(r).add(x); 
 					
 					BigInteger dist;
-					if(mbi.compareTo(new_i_min) == -1) { //if still not enough
-						dist = mbi;
-					} else {
+					if(mbi.compareTo(new_i_min) == 1) { //if still not enough
 						dist = mbi.subtract(pbi);
+					} else {
+						dist = mbi;
 					}
-					x = x.subtract(dist);
+					x = x.subtract(dist.subtract(x));
 				}
 				
 				while(x.compareTo(inter_max) <= 0) {

@@ -133,10 +133,10 @@ public class Factorizer {
 		M = 1000000; //1 million
 		long sqrtn = longSqrt(input);
 		ArrayList<ArrayList<Integer>> factorBase = getLegendrePrimes(input,B);
-		ArrayList<BitSet> finalQs = findQs(factorBase,M,sqrtn,input);
+		ArrayList<QVectorElement> finalQs = findQs(factorBase,M,sqrtn,input);
 		BitSet[] Qarray = new BitSet[finalQs.size()];
 		for(int i = 0; i < finalQs.size(); i++) {
-			Qarray[i] = finalQs.get(i);
+			Qarray[i] = finalQs.get(i).getBitSet();
 		}
 		
 		GaussEliminator ge = new GaussEliminator();
@@ -327,9 +327,9 @@ public class Factorizer {
 		  return (result);
 	}
 	
-	public ArrayList<BitSet> findQs(ArrayList<ArrayList<Integer>> psols, long M, long sqrtn, BigInteger n) {
+	public ArrayList<QVectorElement> findQs(ArrayList<ArrayList<Integer>> psols, long M, long sqrtn, BigInteger n) {
 		//initialize BitSet arraylist
-		ArrayList<BitSet> sols = new ArrayList<BitSet>();
+		ArrayList<QVectorElement> sols = new ArrayList<QVectorElement>();
 		final int EXTRA_Qs = 10;
 		
 		//for(int i = 0; i < psols.size() + EXTRA_Qs;i++) {
@@ -385,7 +385,7 @@ public class Factorizer {
 				while(x.compareTo(inter_max) <= 0) {
 					QVectorElement qve = QVector.get((int) x.subtract(inter_min).longValue());
 					if(qve.divideQWith(i)) {
-						sols.add(qve.getBitSet());
+						sols.add(qve);
 						if(sols.size() == psols.size()+EXTRA_Qs) {
 							//RETURN!!!!!
 							return sols;

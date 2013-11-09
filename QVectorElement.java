@@ -6,6 +6,7 @@ public class QVectorElement {
 
 	private BitSet rep;
 	private final BigInteger x;
+	private BigInteger OriginalQ;
 	private BigInteger Q;
 	private final BigInteger n;
 	private final ArrayList<ArrayList<Integer>> factorBase;
@@ -28,6 +29,7 @@ public class QVectorElement {
 	public boolean divideQWith(int index) {
 		if(!Qcalc) {
 			Q = x.multiply(x).subtract(n);
+			OriginalQ = Q;
 			rep = new BitSet(factorBase.size()+1);
 			Qcalc = true;
 			if(Q.compareTo(BigInteger.ZERO) < 0) {
@@ -63,6 +65,14 @@ public class QVectorElement {
 		} else {
 			return false;
 		}
+	}
+	
+	public BigInteger getX() {
+		return x;
+	}
+	
+	public BigInteger getOriginalQ() {
+		return OriginalQ;
 	}
 	
 	public BitSet getBitSet() {

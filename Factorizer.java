@@ -129,10 +129,18 @@ public class Factorizer {
 	 */
 	private ArrayList<BigInteger> factorizeQS(BigInteger input) {
 		//TODO
+		B = 500;
+		M = 1000000; //1 million
+		long sqrtn = longSqrt(input);
+		ArrayList<ArrayList<Integer>> factorBase = getLegendrePrimes(input,B);
+		ArrayList<QVectorElement> finalQs = findQs(factorBase,M,sqrtn,input);
+		BitSet[] Qarray = new BitSet[finalQs.size()];
+		for(int i = 0; i < finalQs.size(); i++) {
+			Qarray[i] = finalQs.get(i).getBitSet();
+		}
 		
-		
-		
-		
+		GaussEliminator ge = new GaussEliminator();
+		BitSet[] sol = ge.gaussEliminate(Qarray, Qarray.length, factorBase.size()+1);
 		
 		
 		
@@ -195,7 +203,33 @@ public class Factorizer {
 	 * @return The integer square root (BigInteger) of the input value
 	 */
 	private BigInteger bigSqrt(BigInteger n) {
-		return BigInteger.valueOf(longSqrt(n));
+		BigInteger min = BigInteger.ONE;
+		BigInteger max = n;
+		
+		
+		while(max.subtract(min).compareTo(BigInteger.ONE) == 1) {
+			BigInteger c = max.add(min).shiftRight(1);
+			BigInteger pow = c.pow(2);
+			int comp = pow.compareTo(n);
+			if(comp == 0) {
+				//they are equal
+				//found perfect square
+				return c;
+			} else if(comp == 1) {
+				//c^2 is greater than n
+				max = c.subtract(BigInteger.ONE);
+			} else {
+				min = c;
+			}
+		}
+		
+		//now we have a situation where max-min == 1 
+		if(max.pow(2).compareTo(n) < 1) {
+			return max;
+		} else {
+			return min;
+		}
+		//return BigInteger.valueOf(longSqrt(n));
 	}
 	
 	/**
@@ -215,34 +249,7 @@ public class Factorizer {
 		System.err.println("Min and max are: " + min.toString() + " & " + max.toString());
 		System.err.println("Numbits and sqrtNumBits are: " + numBits + " & " + sqrtNumBits);
 		*/
-		
-		
-		BigInteger min = BigInteger.ONE;
-		BigInteger max = n;
-		
-		
-		while(max.subtract(min).compareTo(BigInteger.ONE) == 1) {
-			BigInteger c = max.add(min).shiftRight(1);
-			BigInteger pow = c.pow(2);
-			int comp = pow.compareTo(n);
-			if(comp == 0) {
-				//they are equal
-				//found perfect square
-				return c.longValue();
-			} else if(comp == 1) {
-				//c^2 is greater than n
-				max = c.subtract(BigInteger.ONE);
-			} else {
-				min = c;
-			}
-		}
-		
-		//now we have a situation where max-min == 1 
-		if(max.pow(2).compareTo(n) < 1) {
-			return max.longValue();
-		} else {
-			return min.longValue();
-		}
+		return bigSqrt(n).longValue();
 		
 		//double d = n.doubleValue();
 		//return (long)Math.sqrt(d);
@@ -250,27 +257,43 @@ public class Factorizer {
 	}
 	
 	/**
-	 * Get an arraylist of all primes p less than B which fulfill Legendre(n,p) == 1
+	 * Get an arraylist of arraylists. The inner arraylists' first element
+	 * is a prime p less than B which fulfill Legendre(n,p) == 1. All such primes have their
+	 * own inner arraylist. What follows is up to two different integers which are the solutions
+	 * to that equation.
 	 * @param n
 	 * @param B
 	 * @return
 	 */
-	public ArrayList<Integer> getLegendrePrimes(BigInteger n, int B) {
-		ArrayList<Integer> factorBase = new ArrayList<Integer>();
+	public ArrayList<ArrayList<Integer>> getLegendrePrimes(BigInteger n, int B) {
+		ArrayList<ArrayList<Integer>> factorBase = new ArrayList<ArrayList<Integer>>();
 		for(int i = 0; i < primes.length; i++) {
 			int p = primes[i];
 			if(p > B) {
 				return factorBase;
 			} 
 			int ni = (int) n.mod(BigInteger.valueOf(p)).longValue();
-			
+			ArrayList<Integer> psols = new ArrayList<Integer>();
+			int numFound = 0;
 			for(int j = 1; j < p; j++) {
 				int tmp = (j*j) % p;
 				if(tmp == ni) {
-					factorBase.add(p);
-					break;
+					if(psols.isEmpty())
+						psols.add(p);
+					
+					psols.add(j); //j is solution
+					numFound++;
+					//factorBase.add();
+					//break;
+					if(numFound == 2) {
+						break; //can only be two solutions.
+					}
 				}
 					
+			}
+			
+			if(!psols.isEmpty()) {
+				factorBase.add(psols);
 			}
 			
 		}
@@ -278,30 +301,121 @@ public class Factorizer {
 		return factorBase;
 	}
 	
-	/*
-	 * Some weird legendre method found online, not sure if correct. Return legendre value
-	 * of a over p. Not used atm.
-	 */
-	public long mpmod(long a, long p) {
-		  long power = (p-1)/2;
-		  long result = 1;
-		  a = a % p;
-
-		  while (power > 0) {
-		    if ((power % 2) == 1) {
-		      result = (result * a) % p;
-		    }
-		    a = (a * a) % p;
-		    power = (long) Math.floor(power / 2);
-		  }
-
-		  if (result - p == -1)
-		    result = result - p;
-
-		  
-
-		  return (result);
+	public ArrayList<QVectorElement> findQs(ArrayList<ArrayList<Integer>> psols, long M, long sqrtn, BigInteger n) {
+		//initialize BitSet arraylist
+		ArrayList<QVectorElement> sols = new ArrayList<QVectorElement>();
+		final int EXTRA_Qs = 10;
+		
+		long interSizeHalf = 2500;
+		
+		//first interval
+		BigInteger inter_min = BigInteger.valueOf(sqrtn-interSizeHalf);
+		BigInteger inter_max = BigInteger.valueOf(sqrtn+interSizeHalf);
+		
+		ArrayList<QVectorElement> QVector = new ArrayList<QVectorElement>();
+		for(BigInteger i = inter_min; i.compareTo(inter_max) <= 0; i = i.add(BigInteger.ONE)) {
+			QVector.add(new QVectorElement(psols,i,n));
+		}
+		
+		
+		for(int i = 0; i < psols.size(); i++) {
+			ArrayList<Integer> psol = psols.get(i);
+			int p = psol.get(0);
+			BigInteger pbi = BigInteger.valueOf(p);
+			for(int j = 1; j < psol.size();j++) {
+				BigInteger x = BigInteger.valueOf(psol.get(j));
+				//now we have our x - put it at the beginning of the interval.
+				int comp = x.compareTo(inter_min);
+				if(comp == -1) {
+					//basic idea: k*p + r = inter_min   => k*p = inter_min-r
+					
+					// r = inter_min % p
+					BigInteger r = inter_min.mod(pbi);
+					
+					// k*p = inter_min-r
+					// k*p will always be smaller than or equal to inter_min
+					// however, smallest possible x is k*p+x
+					BigInteger mbi = inter_min.subtract(r).add(x); 
+					
+					//this may already be in the interval
+					//if it isnt, add p to it.
+					if(mbi.compareTo(inter_min) == -1) { //if still not enough
+						x = mbi.add(pbi);
+					} else {
+						x = mbi;
+					}
+				} else if(comp == 0){
+					//do nothing, x is already there!
+				} else {
+					//lower bound is smaller than current x
+					//similar thoughts as above. but now we seek x - k*p
+					//IDEA: move interval to the other side instead.
+					BigInteger new_i_min = x.add(x.subtract(inter_min));
+					//now we can do the same!
+					BigInteger r = new_i_min.mod(pbi);
+					BigInteger tmp = new_i_min.subtract(r);
+					BigInteger mbi = tmp.add(x); 
+					
+					BigInteger dist;
+					if(mbi.compareTo(new_i_min) == 1) { //if still not enough
+						dist = tmp.subtract(pbi);
+					} else {
+						dist = tmp;
+					}
+					x = x.subtract(dist);
+				}
+				
+				while(x.compareTo(inter_max) <= 0) {
+					QVectorElement qve = QVector.get((int) x.subtract(inter_min).longValue());
+					if(qve.divideQWith(i)) {
+						sols.add(qve);
+						if(sols.size() == psols.size()+EXTRA_Qs) {
+							//RETURN!!!!!
+							return sols;
+						}
+					}
+					
+					x = x.add(pbi); //go to next x.
+				}
+				
+				
+			}
+		}
+		//couldnt find adequate Q-vector
+		
+		return null;
 	}
+	
+	/**
+	 * Return the factors from the given solution.
+	 * @param factored a bitset of the Qs to use in the calculations.
+	 * @param qVector A vector of all Qs of which the remainder Q is 1.
+	 * @param n The number to factor.
+	 * @return
+	 */
+	public BigInteger[] getFactors(BitSet factored, ArrayList<QVectorElement> qVector, BigInteger n) {
+		
+		//ArrayList<QVectorElement> relevant = new ArrayList<QVectorElement>();
+		BigInteger x = BigInteger.ONE;
+		BigInteger y = BigInteger.ONE;
+		for(int i = 0; i < qVector.size(); i++) {
+			if(factored.get(i)) {
+				QVectorElement qve = qVector.get(i);
+				x = x.multiply(qve.getX()).mod(n);
+				y = y.multiply(qve.getOriginalQ()).mod(n); //keep the numbers "small"
+			}
+		}
+		
+		y = bigSqrt(y);
+		
+		BigInteger[] factors = new BigInteger[2];
+		factors[0] = x.subtract(y).gcd(n);
+		factors[1] = x.add(y).gcd(n);
+		
+		return factors;
+	}
+	
+	
 	
 }
 

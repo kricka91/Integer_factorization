@@ -68,7 +68,7 @@ public class GaussEliminator {
 		return null;
 	}
 	
-	private BitSet[] gaussEliminate(BitSet[] matrix, int r, int c) {
+	public BitSet[] gaussEliminate(BitSet[] matrix, int r, int c) {
 		int[] originalOrder = new int[r];
 		for (int i = 0;i<r;i++) {
 			originalOrder[i] = i;

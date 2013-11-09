@@ -25,7 +25,7 @@ public class GaussEliminator {
 		
 		rows = sc.nextInt();
 		columns = sc.nextInt();
-		BitSet[] matrix = new BitSet[columns];
+		BitSet[] matrix = new BitSet[rows];
 		int curBit = 0;
 		boolean boolCurBit = false;
 		
@@ -73,28 +73,37 @@ public class GaussEliminator {
 		for (int i = 0;i<r;i++) {
 			originalOrder[i] = i;
 		}
+		
 		BitSet tmp;
 		int itmp;
+		int cNoBit = 0;
 		int x = -1;
 		for (int j = 0;j<c;j++) {
+			
+			printMatrix(matrix, r, c);
+			
 			x = -1;
-			for (int i = j;i<r;i++) {
+			for (int i = j-cNoBit;i<r;i++) {
 				if (matrix[i].get(j) == true) {
 					if (x < 0) {
 						x = i;
 					} else {
+						System.err.println("xoring " + i + " with " + x);
 						matrix[i].xor(matrix[x]);
 					}
 				}
 			}
 			
 			if (x > -1) {
-				tmp = (BitSet)matrix[j].clone();
-				matrix[j] = (BitSet)matrix[x].clone();
+				System.err.println("x and j are: " + x + " and " + j);
+				tmp = (BitSet)matrix[j-cNoBit].clone();
+				matrix[j-cNoBit] = (BitSet)matrix[x].clone();
 				matrix[x] = (BitSet)tmp.clone();
-				itmp = originalOrder[j];
-				originalOrder[j] = originalOrder[x];
+				itmp = originalOrder[j-cNoBit];
+				originalOrder[j-cNoBit] = originalOrder[x];
 				originalOrder[x] = itmp;
+			} else {
+				cNoBit++;
 			}
 		}
 		

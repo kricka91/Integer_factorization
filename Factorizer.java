@@ -203,7 +203,33 @@ public class Factorizer {
 	 * @return The integer square root (BigInteger) of the input value
 	 */
 	private BigInteger bigSqrt(BigInteger n) {
-		return BigInteger.valueOf(longSqrt(n));
+		BigInteger min = BigInteger.ONE;
+		BigInteger max = n;
+		
+		
+		while(max.subtract(min).compareTo(BigInteger.ONE) == 1) {
+			BigInteger c = max.add(min).shiftRight(1);
+			BigInteger pow = c.pow(2);
+			int comp = pow.compareTo(n);
+			if(comp == 0) {
+				//they are equal
+				//found perfect square
+				return c;
+			} else if(comp == 1) {
+				//c^2 is greater than n
+				max = c.subtract(BigInteger.ONE);
+			} else {
+				min = c;
+			}
+		}
+		
+		//now we have a situation where max-min == 1 
+		if(max.pow(2).compareTo(n) < 1) {
+			return max;
+		} else {
+			return min;
+		}
+		//return BigInteger.valueOf(longSqrt(n));
 	}
 	
 	/**
@@ -223,34 +249,7 @@ public class Factorizer {
 		System.err.println("Min and max are: " + min.toString() + " & " + max.toString());
 		System.err.println("Numbits and sqrtNumBits are: " + numBits + " & " + sqrtNumBits);
 		*/
-		
-		
-		BigInteger min = BigInteger.ONE;
-		BigInteger max = n;
-		
-		
-		while(max.subtract(min).compareTo(BigInteger.ONE) == 1) {
-			BigInteger c = max.add(min).shiftRight(1);
-			BigInteger pow = c.pow(2);
-			int comp = pow.compareTo(n);
-			if(comp == 0) {
-				//they are equal
-				//found perfect square
-				return c.longValue();
-			} else if(comp == 1) {
-				//c^2 is greater than n
-				max = c.subtract(BigInteger.ONE);
-			} else {
-				min = c;
-			}
-		}
-		
-		//now we have a situation where max-min == 1 
-		if(max.pow(2).compareTo(n) < 1) {
-			return max.longValue();
-		} else {
-			return min.longValue();
-		}
+		return bigSqrt(n).longValue();
 		
 		//double d = n.doubleValue();
 		//return (long)Math.sqrt(d);
@@ -300,31 +299,6 @@ public class Factorizer {
 		}
 		
 		return factorBase;
-	}
-	
-	/*
-	 * Some weird legendre method found online, not sure if correct. Return legendre value
-	 * of a over p. Not used atm.
-	 */
-	public long mpmod(long a, long p) {
-		  long power = (p-1)/2;
-		  long result = 1;
-		  a = a % p;
-
-		  while (power > 0) {
-		    if ((power % 2) == 1) {
-		      result = (result * a) % p;
-		    }
-		    a = (a * a) % p;
-		    power = (long) Math.floor(power / 2);
-		  }
-
-		  if (result - p == -1)
-		    result = result - p;
-
-		  
-
-		  return (result);
 	}
 	
 	public ArrayList<QVectorElement> findQs(ArrayList<ArrayList<Integer>> psols, long M, long sqrtn, BigInteger n) {
@@ -402,6 +376,36 @@ public class Factorizer {
 		
 		return null;
 	}
+	
+	/**
+	 * Return the factors from the given solution.
+	 * @param factored a bitset of the Qs to use in the calculations.
+	 * @param qVector A vector of all Qs of which the remainder Q is 1.
+	 * @param n The number to factor.
+	 * @return
+	 */
+	public BigInteger[] getFactors(BitSet factored, ArrayList<QVectorElement> qVector, BigInteger n) {
+		
+		//ArrayList<QVectorElement> relevant = new ArrayList<QVectorElement>();
+		BigInteger x = BigInteger.ONE;
+		BigInteger y = BigInteger.ONE;
+		for(int i = 0; i < qVector.size(); i++) {
+			if(factored.get(i)) {
+				QVectorElement qve = qVector.get(i);
+				x = x.multiply(qve.getX()).mod(n);
+				y = y.multiply(qve.getOriginalQ()).mod(n); //keep the numbers "small"
+			}
+		}
+		
+		y = bigSqrt(y);
+		
+		BigInteger[] factors = new BigInteger[2];
+		factors[0] = x.subtract(y).gcd(n);
+		factors[1] = x.add(y).gcd(n);
+		
+		return factors;
+	}
+	
 	
 	
 }

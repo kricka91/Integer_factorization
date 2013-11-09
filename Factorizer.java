@@ -131,7 +131,7 @@ public class Factorizer {
 		//TODO
 		B = 500;
 		M = 1000000; //1 million
-		long sqrtn = longSqrt(input);
+		BigInteger sqrtn = bigSqrt(input);
 		ArrayList<ArrayList<Integer>> factorBase = getLegendrePrimes(input,B);
 		ArrayList<QVectorElement> finalQs = findQs(factorBase,M,sqrtn,input);
 		BitSet[] Qarray = new BitSet[finalQs.size()];
@@ -301,16 +301,54 @@ public class Factorizer {
 		return factorBase;
 	}
 	
-	public ArrayList<QVectorElement> findQs(ArrayList<ArrayList<Integer>> psols, long M, long sqrtn, BigInteger n) {
+	public ArrayList<QVectorElement> findQs(ArrayList<ArrayList<Integer>> psols, 
+												long M, BigInteger sqrtn, BigInteger n) {
 		//initialize BitSet arraylist
 		ArrayList<QVectorElement> sols = new ArrayList<QVectorElement>();
-		final int EXTRA_Qs = 10;
+		//final int EXTRA_Qs = 10;
+		final int goal = psols.size()+10; //TODO parameters are here!!
+		final int maxIntervals = 30;
+		final BigInteger interSize = BigInteger.valueOf(5000);
 		
-		long interSizeHalf = 2500;
+		BigInteger lowEnd = sqrtn;
+		BigInteger highStart = sqrtn.add(BigInteger.ONE); 
 		
 		//first interval
-		BigInteger inter_min = BigInteger.valueOf(sqrtn-interSizeHalf);
-		BigInteger inter_max = BigInteger.valueOf(sqrtn+interSizeHalf);
+		int numItersDone = 0;
+		while(numItersDone < maxIntervals && sols.size() < goal) {
+			//low end
+			BigInteger interMin = lowEnd.subtract(interSize);
+			BigInteger interMax = lowEnd;
+			//search interval
+			sols = searchQInInterval(sols,psols,interMin,interMax,n,goal);
+			
+			if(sols.size() >= goal) {
+				return sols;
+			}
+			//not at our goal yet!
+			//update low_end
+			lowEnd = interMin.subtract(BigInteger.ONE);
+			
+			//search high interval now
+			interMin = highStart;
+			interMax = highStart.add(interSize);
+			
+			sols = searchQInInterval(sols,psols,interMin,interMax,n,goal);
+			//update highStart
+			highStart = interMax.add(BigInteger.ONE);
+		}
+		
+		
+		
+		//BigInteger inter_min = BigInteger.valueOf(sqrtn-interSizeHalf);
+		//BigInteger inter_max = BigInteger.valueOf(sqrtn+interSizeHalf);
+		
+		return sols;
+	}
+	
+	private ArrayList<QVectorElement> searchQInInterval(
+			ArrayList<QVectorElement> sols, ArrayList<ArrayList<Integer>> psols,
+			BigInteger inter_min, BigInteger inter_max, BigInteger n, int goal) {
 		
 		ArrayList<QVectorElement> QVector = new ArrayList<QVectorElement>();
 		for(BigInteger i = inter_min; i.compareTo(inter_max) <= 0; i = i.add(BigInteger.ONE)) {
@@ -369,7 +407,7 @@ public class Factorizer {
 					QVectorElement qve = QVector.get((int) x.subtract(inter_min).longValue());
 					if(qve.divideQWith(i)) {
 						sols.add(qve);
-						if(sols.size() == psols.size()+EXTRA_Qs) {
+						if(sols.size() == goal) {
 							//RETURN!!!!!
 							return sols;
 						}
@@ -381,10 +419,10 @@ public class Factorizer {
 				
 			}
 		}
-		//couldnt find adequate Q-vector
-		
-		return null;
+		return sols;
 	}
+	
+	
 	
 	/**
 	 * Return the factors from the given solution.

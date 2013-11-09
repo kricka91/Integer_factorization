@@ -28,6 +28,8 @@ public class Factorizer {
 	private int B;
 	private int M;
 	
+	private BigInteger threshHold = BigInteger.valueOf(1000000);
+	
 	//Methods
 	/**
 	 * Constructor
@@ -97,11 +99,15 @@ public class Factorizer {
 				System.err.println("Invalid number format.");
 				return;
 			}
-			System.out.println("Square root is: " + factorizer.longSqrt(input));
+			//System.out.println("Square root is: " + factorizer.longSqrt(input));
 			
 			ArrayList<BigInteger> result = factorizer.factorize(input);
-			for (int i = 0;i<result.size();i++) {
-				System.out.println(result.get(i));
+			if(result == null) {
+				System.out.println("fail");
+			} else {
+				for (int i = 0;i<result.size();i++) {
+					System.out.println(result.get(i));
+				}
 			}
 			System.out.println();
 		}
@@ -120,8 +126,17 @@ public class Factorizer {
 			System.err.println("Input is smaller than 2...");
 			System.exit(0);
 		}
+		//BigInteger threshHold = BigInteger.valueOf(1000);
+		if(input.compareTo(threshHold) <= 0) {
+			return factorizeNaive(input);
+		} else {
+			return null; //TODO
+			//return factorizeQS(input);
+		}
 		
-		return factorizeNaive(input);
+		
+		
+		//return factorizeNaive(input);
 	}
 	
 	/**

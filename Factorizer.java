@@ -71,6 +71,7 @@ public class Factorizer {
 			}
 			//System.out.println("Square root is: " + factorizer.longSqrt(input));
 			//System.out.println("Cube root is: " + factorizer.longMRoot(input,4));
+
 			
 			ArrayList<BigInteger> result = factorizer.factorize(input);
 			if(result == null) {
@@ -188,6 +189,7 @@ public class Factorizer {
 	private ArrayList<BigInteger> factorizeQS(BigInteger input) {
 		//TODO
 		B = 500;
+		//B = max 422?
 		M = 1000000; //1 million
 		BigInteger sqrtn = bigSqrt(input);
 		ArrayList<ArrayList<Integer>> factorBase = getLegendrePrimes(input,B);
@@ -199,8 +201,8 @@ public class Factorizer {
 		
 		//GaussEliminator ge = new GaussEliminator();
 		//BitSet[] sol = ge.gaussEliminate(Qarray, Qarray.length, factorBase.size()+1);
-		System.out.println("factors in factor base: " + factorBase.size()); //TODO
-		System.out.println("Final Q size: " + finalQs.size());
+		System.err.println("factors in factor base: " + factorBase.size()); //TODO
+		System.err.println("Final Q size: " + finalQs.size());
 		
 
 

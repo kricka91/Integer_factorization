@@ -79,7 +79,7 @@ public class GaussEliminator {
 	}
 	
 	
-	private BitSet getFreeVariables(BitSet[] matrix, int r, int c) {
+	public BitSet getFreeVariables(BitSet[] matrix, int r, int c) {
 		
 		if (c > r) {
 			System.err.println("Matrix is wide...");
@@ -109,7 +109,7 @@ public class GaussEliminator {
 	
 	//Prev denotes the solution given by the previous call to this function
 	//Free denotes the free variables, calculated by getFreeVariables();
-	private BitSet calcNullSpace(BitSet[] matrix, int r, int c, final BitSet free, final BitSet prev) {
+	public BitSet calcNullSpace(BitSet[] matrix, int r, int c, final BitSet free, final BitSet prev) {
 		
 		if (free == null || free.isEmpty()) {	//Return zero-vector
 			BitSet ret = new BitSet(c);

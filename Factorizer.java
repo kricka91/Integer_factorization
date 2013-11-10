@@ -27,7 +27,7 @@ public class Factorizer {
 	private int B;
 	private int M;
 	
-	private BigInteger threshHold = new BigInteger("10000000");
+	private BigInteger threshHold = new BigInteger("100000000");
 	
 	//Methods
 	/**
@@ -103,10 +103,20 @@ public class Factorizer {
 		//factorizeQS(input);
 		
 		//System.out.println(bigMRoot(input,15));
+		ArrayList<BigInteger> factors = new ArrayList<BigInteger>();
+		
+		final int certainty = 10; //TODO parameter here
+		
+		
+		if(input.isProbablePrime(certainty)) {
+			factors.add(input);
+			return factors;
+		}
+		
 		
 		//first, remove small factors by trial division.
 		BigInteger rem = input;
-		ArrayList<BigInteger> factors = new ArrayList<BigInteger>();
+		
 		
 		for(int p : primes) {
 			boolean divAll = false;
@@ -149,7 +159,7 @@ public class Factorizer {
 		}
 			
 		if(exponent != -1) {
-			System.err.println("Found exponent: " + exponent);
+			//System.err.println("Found exponent: " + exponent);
 			ArrayList<BigInteger> remFactorized = factorize(rem);
 			if(remFactorized == null) {
 				return null;
@@ -173,9 +183,11 @@ public class Factorizer {
 			else
 				return null;
 		} else {
-			
-			return null; //TODO
-			//return factorizeQS(input);
+			ArrayList<BigInteger> tmp = factorizeQS(rem);
+			if(tmp != null)
+				factors.addAll(tmp);
+			else
+				return null;
 		}
 		
 		
@@ -191,23 +203,81 @@ public class Factorizer {
 		B = 500;
 		//B = max 422?
 		M = 1000000; //1 million
+		
+		ArrayList<BigInteger> factors = new ArrayList<BigInteger>();
+		
 		BigInteger sqrtn = bigSqrt(input);
 		ArrayList<ArrayList<Integer>> factorBase = getLegendrePrimes(input,B);
 		ArrayList<QVectorElement> finalQs = findQs(factorBase,M,sqrtn,input);
-		//BitSet[] Qarray = new BitSet[finalQs.size()];
-		//for(int i = 0; i < finalQs.size(); i++) {
-			//Qarray[i] = finalQs.get(i).getBitSet();
-		//}
+		BitSet[] Qarray = new BitSet[finalQs.size()];
+		for(int i = 0; i < finalQs.size(); i++) {
+			Qarray[i] = finalQs.get(i).getBitSet();
+		}
 		
-		//GaussEliminator ge = new GaussEliminator();
-		//BitSet[] sol = ge.gaussEliminate(Qarray, Qarray.length, factorBase.size()+1);
-		System.err.println("factors in factor base: " + factorBase.size()); //TODO
-		System.err.println("Final Q size: " + finalQs.size());
+		GaussEliminator ge = new GaussEliminator();
+		int r = Qarray.length;
+		int c = factorBase.size()+1;
+		final BitSet free = ge.getFreeVariables(Qarray, r, c);
+		
+		boolean foundFactors = false;
+		BitSet sol = null;
+		while(!foundFactors) {
+			sol = ge.calcNullSpace(Qarray, r, c, free, sol);
+			if(sol.isEmpty()) 
+				break;
+			BigInteger[] possibleFactors = getFactors(sol,finalQs,input);
+			
+			//check results
+			if(possibleFactors[0].compareTo(BigInteger.ONE) == 1) {
+				//wooooh, found factor :)
+				foundFactors = true;
+				BigInteger rem = input.divide(possibleFactors[0]);
+				if(possibleFactors[1].equals(rem)) {
+					//input == possiblefactors[0]*possibleFactors[1]
+					ArrayList<BigInteger> factorsOf0 = factorize(possibleFactors[0]);
+					ArrayList<BigInteger> factorsOf1 = factorize(possibleFactors[1]);
+					factors.addAll(factorsOf0);
+					factors.addAll(factorsOf1);
+					return factors;
+				} else {
+					//input == possibleFactors[0]*rem
+					
+					//TODO possible optimization here by checking possibleFactors[1]
+					ArrayList<BigInteger> factorsOf0 = factorize(possibleFactors[0]);
+					ArrayList<BigInteger> factorsOfRem = factorize(rem);
+					factors.addAll(factorsOf0);
+					factors.addAll(factorsOfRem);
+					return factors;
+				}
+			}
+			
+			if(possibleFactors[1].compareTo(BigInteger.ONE) == 1) {
+				foundFactors = true;
+				BigInteger rem = input.divide(possibleFactors[1]);
+				ArrayList<BigInteger> factorsOf1 = factorize(possibleFactors[1]);
+				ArrayList<BigInteger> factorsOfRem = factorize(rem);
+				factors.addAll(factorsOf1);
+				factors.addAll(factorsOfRem);
+				return factors;
+			}
+			
+			
+			//public BigInteger[] getFactors(BitSet factored, ArrayList<QVectorElement> qVector, BigInteger n) {
+				
+		}
+		
+		if(foundFactors)
+			return factors;
+		else
+			return null; //couldnt factorize
+		
+		//System.err.println("factors in factor base: " + factorBase.size()); //TODO
+		//System.err.println("Final Q size: " + finalQs.size());
 		
 
 
 
-		return null;
+		
 	}
 	
 	/**

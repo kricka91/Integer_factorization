@@ -121,6 +121,7 @@ public class GaussEliminator {
 		
 		int lastRow;
 		BitSet lr;
+
 		if (prev == null || prev.isEmpty()) {
 			lastRow = c-1;
 			variables = new BitSet(c);
@@ -129,6 +130,30 @@ public class GaussEliminator {
 			lr = (BitSet)prev.clone();
 			lr.and(free);
 			lastRow = lr.length()-1;
+			
+			/*
+			if (lastRow == -1) {
+				System.err.println("lastRow is negative!");
+				System.err.println("prev is: " + prev.toString());
+				printBitSet(prev, prev.size());
+				System.err.println("prev length is " + prev.length());
+				System.err.println("lr is " + lr.toString());
+				printBitSet(lr, lr.size());
+				System.err.println("lr length is " + lr.length());
+				
+				System.err.println("Bits 0 and 1 of lr are:");
+				System.err.println("" + lr.get(0));
+				System.err.println("" + lr.get(1));
+				
+				System.err.println("free is " + free.toString());
+				printBitSet(free, free.size());
+				System.err.println("free length is " + free.length());
+			}
+			*/
+			if (lastRow == -1) {
+				lastRow++;
+			}
+			
 			variables = (BitSet)prev.clone();
 			variables.set(0,lastRow);
 			variables.clear(lastRow);

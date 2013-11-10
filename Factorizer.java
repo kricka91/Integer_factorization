@@ -93,7 +93,7 @@ public class Factorizer {
 		//Choose the appropriate method
 		
 		//Some input checking, although Kattis
-		//doesn't give us number smaller than 2
+		//doesn't give us numbers smaller than 2
 		if (BigInteger.ONE.equals(input.max(BigInteger.ONE))) {
 			System.err.println(input);
 			System.err.println("Input is smaller than 2...");
@@ -183,11 +183,20 @@ public class Factorizer {
 			else
 				return null;
 		} else {
+			System.err.println("Calling factorizeQS with parameter: " + rem);
 			ArrayList<BigInteger> tmp = factorizeQS(rem);
-			if(tmp != null)
+			if(tmp != null) {
 				factors.addAll(tmp);
-			else
+				
+				System.err.println("Found " + tmp.size() + " factors:");
+				for (int i = 0;i<tmp.size();i++) {
+					System.err.println("" + tmp.get(i));
+				}
+				
+			} else {
+				System.err.println("FactorizeQS returned null");
 				return null;
+			}
 		}
 		
 		
@@ -228,12 +237,15 @@ public class Factorizer {
 			BigInteger[] possibleFactors = getFactors(sol,finalQs,input);
 			
 			//check results
-			if(possibleFactors[0].compareTo(BigInteger.ONE) == 1) {
+			if(possibleFactors[0].compareTo(BigInteger.ONE) == 1 && possibleFactors[1].compareTo(BigInteger.ONE) == 1) {
 				//wooooh, found factor :)
 				foundFactors = true;
 				BigInteger rem = input.divide(possibleFactors[0]);
 				if(possibleFactors[1].equals(rem)) {
 					//input == possiblefactors[0]*possibleFactors[1]
+					System.err.println("Before recursive call; possibleFactors are:");
+					System.err.println(possibleFactors[0]);
+					System.err.println(possibleFactors[1]);
 					ArrayList<BigInteger> factorsOf0 = factorize(possibleFactors[0]);
 					ArrayList<BigInteger> factorsOf1 = factorize(possibleFactors[1]);
 					factors.addAll(factorsOf0);

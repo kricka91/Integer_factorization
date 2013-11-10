@@ -69,8 +69,8 @@ public class Factorizer {
 				System.err.println("Invalid number format.");
 				return;
 			}
-			System.out.println("Square root is: " + factorizer.longSqrt(input));
-			System.out.println("Cube root is: " + factorizer.longMRoot(input,3));
+			System.err.println("Square root is: " + factorizer.longSqrt(input));
+			System.err.println("Cube root is: " + factorizer.longMRoot(input,3));
 			
 			ArrayList<BigInteger> result = factorizer.factorize(input);
 			if(result == null) {
@@ -127,7 +127,7 @@ public class Factorizer {
 
 		//check if remainder is perfect square
 		//BigDecimal bd = new BigDecimal(rem);
-		//final int maxExponent = 20;
+		//final int maxExponent = 11;
 
 		
 		
@@ -156,6 +156,7 @@ public class Factorizer {
 	private ArrayList<BigInteger> factorizeQS(BigInteger input) {
 		//TODO
 		B = 500;
+		//B = max 422?
 		M = 1000000; //1 million
 		BigInteger sqrtn = bigSqrt(input);
 		ArrayList<ArrayList<Integer>> factorBase = getLegendrePrimes(input,B);
@@ -167,8 +168,8 @@ public class Factorizer {
 		
 		//GaussEliminator ge = new GaussEliminator();
 		//BitSet[] sol = ge.gaussEliminate(Qarray, Qarray.length, factorBase.size()+1);
-		System.out.println("factors in factor base: " + factorBase.size()); //TODO
-		System.out.println("Final Q size: " + finalQs.size());
+		System.err.println("factors in factor base: " + factorBase.size()); //TODO
+		System.err.println("Final Q size: " + finalQs.size());
 		
 
 

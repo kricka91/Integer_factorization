@@ -56,10 +56,19 @@ public class GaussEliminator {
 		System.err.println("After Gauss elimination");
 		printMatrix(matrix, rows, columns);
 		
-		BitSet nullspace = calcNullSpace(matrix, rows, columns);
-		System.err.println("Null space vector: ");
-		printBitSet(nullspace, columns);
+		BitSet freeVar = getFreeVariables(matrix, rows, columns);
+		System.err.println("Free variables: ");
+		printBitSet(freeVar, columns);
 		
+		BitSet nullspace = null;
+		while (true) {
+			nullspace = calcNullSpace(matrix, rows, columns, freeVar, nullspace);
+			System.err.println("Null space vector: ");
+			printBitSet(nullspace, columns);
+			if (nullspace.isEmpty()) {
+				break;
+			}
+		}
 	}
 
 	/**
@@ -69,26 +78,75 @@ public class GaussEliminator {
 		new GaussEliminator().run();
 	}
 	
-	private BitSet calcNullSpace(BitSet[] matrix, int r, int c) {
 	
-		BitSet variables = new BitSet(c);
-		variables.set(0,c);
-		BitSet mask = new BitSet(c);
-		BitSet bsTmp = new BitSet(c);
+	private BitSet getFreeVariables(BitSet[] matrix, int r, int c) {
+		
+		if (c > r) {
+			System.err.println("Matrix is wide...");
+			return null;
+		}
+		
+		BitSet res = new BitSet(c);
 		
 		//Warning. We assume that the matrix is "high" or square. Might crash otherwise.
 		for(int i = c-1; i >= 0; i--) {	//Lower rows should be all 0 anyway
 			
-			bsTmp = (BitSet)matrix[i].clone();
-			mask.set(i);
+			boolean bitValue = matrix[i].get(i);
 			
+			if (bitValue) {	//Bound
+				//System.err.println("Bound!");
+				res.clear(i);
+			} else {	//Free
+				//System.err.println("Free!");
+				res.set(i);
+			}
+			
+		}
+		
+		return res;
+	}
+	
+	
+	//Prev denotes the solution given by the previous call to this function
+	//Free denotes the free variables, calculated by getFreeVariables();
+	private BitSet calcNullSpace(BitSet[] matrix, int r, int c, final BitSet free, final BitSet prev) {
+		
+		if (free == null || free.isEmpty()) {	//Return zero-vector
+			BitSet ret = new BitSet(c);
+			ret.clear();
+			return ret;
+		}
+		
+		BitSet variables;
+		
+		int lastRow;
+		BitSet lr;
+		if (prev == null || prev.isEmpty()) {
+			lastRow = c-1;
+			variables = new BitSet(c);
+			variables.set(0,c);
+		} else {
+			lr = (BitSet)prev.clone();
+			lr.and(free);
+			lastRow = lr.length()-1;
+			variables = (BitSet)prev.clone();
+			variables.set(0,lastRow);
+			variables.clear(lastRow);
+			//System.err.println("variables is now:");
+			//printBitSet(variables, c);
+			lastRow--;
+		}
+		
+		BitSet bsTmp = new BitSet(c);
+		
+		//Warning. We assume that the matrix is "high" or square. Might crash otherwise.
+		for(int i = lastRow; i >= 0; i--) {	//Lower rows should be all 0 anyway
+			
+			bsTmp = (BitSet)matrix[i].clone();
 			//Set the variables
 			bsTmp.and(variables);
 			
-			//Check if variable is bound or free
-			mask.and(bsTmp);
-			
-			if (mask.get(i)) {	//Bound
+			if (!free.get(i)) {	//Bound
 				//System.err.println("Bound!");
 				//Determine what we need to set it to
 				int bitVal = bsTmp.cardinality();
@@ -149,10 +207,14 @@ public class GaussEliminator {
 	}
 	
 	private void printBitSet(BitSet bs, int c) {
-		for (int j = 0;j<c;j++) {
-			System.err.print(bs.get(j) == true ? 1 : 0);
+		if (bs != null) {
+			for (int j = 0;j<c;j++) {
+				System.err.print(bs.get(j) == true ? 1 : 0);
+			}
+			System.err.println();
+		} else {
+			System.err.println("null");
 		}
-		System.err.println();
 	}
 }
 

@@ -91,6 +91,7 @@ public class Factorizer {
 	private ArrayList<BigInteger> factorize(BigInteger input) {
 		//TODO
 		//Choose the appropriate method
+		System.err.println("calling factorize");
 		
 		//Some input checking, although Kattis
 		//doesn't give us numbers smaller than 2
@@ -221,20 +222,41 @@ public class Factorizer {
 		
 		BigInteger sqrtn = bigSqrt(input);
 		ArrayList<ArrayList<Integer>> factorBase = getLegendrePrimes(input,B);
+		System.err.println("FactorBase: " + factorBase.size());
+		System.err.println(factorBase);
+		System.err.println("searching for Qs...");
 		ArrayList<QVectorElement> finalQs = findQs(factorBase,M,sqrtn,input);
+		System.err.println("found " + finalQs.size() + " Qs");
+		for(int i = 0; i < finalQs.size(); i++) {
+			System.err.print(finalQs.get(i).getOriginalQ() + " ");
+		}
+		System.err.println();
 		BitSet[] Qarray = new BitSet[finalQs.size()];
 		for(int i = 0; i < finalQs.size(); i++) {
 			Qarray[i] = finalQs.get(i).getBitSet();
 		}
+		//System.err.println("Found All Qs!");
 		
 		GaussEliminator ge = new GaussEliminator();
+		
 		int r = Qarray.length;
 		int c = factorBase.size()+1;
+		System.err.println("r: " + r + ", c:" + c);
+		ge.printMatrix(Qarray, r, c);
+		Qarray = ge.gaussEliminate(Qarray, r, c);
+		System.err.println("-------------");
+		ge.printMatrix(Qarray, r, c);
 		final BitSet free = ge.getFreeVariables(Qarray, r, c);
-		
+		//System.err.println("free:");
+		//ge.printBitSet(free, c);
 		boolean foundFactors = false;
 		BitSet sol = null;
+		int maxIters = 50;
+		int iter = 0;
 		while(!foundFactors) {
+			
+			if(iter == maxIters)
+				break;
 			//System.err.println("Matrix: ");
 			//System.err.println(Qarray);
 			//System.err.println("r: " + r + ", c: " + c);
@@ -246,22 +268,33 @@ public class Factorizer {
 			else
 				System.err.println("sol is null");
 			*/
-			
+			//System.err.println("1");
 			sol = ge.calcNullSpace(Qarray, r, c, free, sol);
+			ge.printBitSet(sol, c);
+			
+			//System.err.println("2");
 			if(sol.isEmpty()) 
 				break;
 			BigInteger[] possibleFactors = getFactors(sol,finalQs,input);
 			
+			//if(possibleFactors[0].equals(BigInteger.ONE) && possibleFactors[0].equals(BigInteger.ONE)) {
+				//System.err.println("BOTH ARE ONE");
+			//}
+			
+			
 			//check results
-			if(possibleFactors[0].compareTo(BigInteger.ONE) == 1 && possibleFactors[1].compareTo(BigInteger.ONE) == 1) {
+			if(possibleFactors[0].compareTo(BigInteger.ONE) == 1) {
 				//wooooh, found factor :)
+				System.err.println("FOUND FACTORS");
 				foundFactors = true;
 				BigInteger rem = input.divide(possibleFactors[0]);
+				
+				if(!rem.equals(BigInteger.ONE))
 				if(possibleFactors[1].equals(rem)) {
 					//input == possiblefactors[0]*possibleFactors[1]
-					System.err.println("Before recursive call; possibleFactors are:");
-					System.err.println(possibleFactors[0]);
-					System.err.println(possibleFactors[1]);
+					//System.err.println("Before recursive call; possibleFactors are:");
+					//System.err.println(possibleFactors[0]);
+					//System.err.println(possibleFactors[1]);
 					ArrayList<BigInteger> factorsOf0 = factorize(possibleFactors[0]);
 					ArrayList<BigInteger> factorsOf1 = factorize(possibleFactors[1]);
 					factors.addAll(factorsOf0);
@@ -273,6 +306,8 @@ public class Factorizer {
 					//TODO possible optimization here by checking possibleFactors[1]
 					ArrayList<BigInteger> factorsOf0 = factorize(possibleFactors[0]);
 					ArrayList<BigInteger> factorsOfRem = factorize(rem);
+					if(factorsOf0 == null || factorsOfRem == null)
+						return null;
 					factors.addAll(factorsOf0);
 					factors.addAll(factorsOfRem);
 					return factors;
@@ -285,13 +320,17 @@ public class Factorizer {
 				BigInteger rem = input.divide(possibleFactors[1]);
 				ArrayList<BigInteger> factorsOf1 = factorize(possibleFactors[1]);
 				ArrayList<BigInteger> factorsOfRem = factorize(rem);
+				
+				if(factorsOf1 == null || factorsOfRem == null)
+					return null;
+				
 				factors.addAll(factorsOf1);
 				factors.addAll(factorsOfRem);
 				return factors;
 			}
 			*/
 			
-			
+			iter++;
 			//public BigInteger[] getFactors(BitSet factored, ArrayList<QVectorElement> qVector, BigInteger n) {
 				
 		}
@@ -484,7 +523,7 @@ public class Factorizer {
 		//final int EXTRA_Qs = 10;
 		final int goal = psols.size()+10; //TODO parameters are here!!
 		final int maxIntervals = 30;
-		final BigInteger interSize = BigInteger.valueOf(5000);
+		final BigInteger interSize = BigInteger.valueOf(500);
 		
 		BigInteger lowEnd = sqrtn;
 		BigInteger highStart = sqrtn.add(BigInteger.ONE); 

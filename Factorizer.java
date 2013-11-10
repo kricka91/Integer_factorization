@@ -137,6 +137,10 @@ public class Factorizer {
 		if(rem.equals(BigInteger.ONE))
 			return factors;
 		
+		if(rem.isProbablePrime(certainty)) {
+			factors.add(rem);
+			return factors;
+		}
 
 		//check if remainder is perfect square
 		BigDecimal bd = new BigDecimal(rem);
@@ -222,6 +226,18 @@ public class Factorizer {
 		boolean foundFactors = false;
 		BitSet sol = null;
 		while(!foundFactors) {
+			//System.err.println("Matrix: ");
+			//System.err.println(Qarray);
+			//System.err.println("r: " + r + ", c: " + c);
+			//System.err.println("free: " + ge.printBitSet(free, c));
+			//ge.printBitSet(free, c);
+			/*if(sol!= null)
+				ge.printBitSet(sol, c);
+				//System.err.println("sol: " + sol);
+			else
+				System.err.println("sol is null");
+			*/
+			
 			sol = ge.calcNullSpace(Qarray, r, c, free, sol);
 			if(sol.isEmpty()) 
 				break;

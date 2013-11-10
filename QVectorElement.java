@@ -37,17 +37,17 @@ public class QVectorElement {
 				rep.set(0);
 			}
 		}
-		index = index+1;
+		int bitindex = index+1;
 		
 		int numDivs = 0;
 		boolean all = false;
 		while(!all) {
-			BigInteger[] tmp = Q.divideAndRemainder(BigInteger.valueOf(factorBase.get(index+1).get(0)));
+			BigInteger[] tmp = Q.divideAndRemainder(BigInteger.valueOf(factorBase.get(index).get(0)));
 			if(tmp[1].equals(BigInteger.ZERO)) {
 				Q = tmp[0];
 				numDivs++;
 			} else {
-				all = false;
+				all = true;
 			}
 		}
 		
@@ -57,7 +57,7 @@ public class QVectorElement {
 		}
 		
 		if(numDivs%2 == 1) {
-			rep.set(index);
+			rep.set(bitindex);
 		}
 		
 		if(Q.equals(BigInteger.ONE)) {

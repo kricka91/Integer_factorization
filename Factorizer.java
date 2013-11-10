@@ -96,9 +96,12 @@ public class Factorizer {
 			System.exit(0);
 		}
 		//BigInteger threshHold = BigInteger.valueOf(1000);
+		//factorizeQS(input);
+		
 		if(input.compareTo(threshHold) <= 0) {
 			return factorizeNaive(input);
 		} else {
+			
 			return null; //TODO
 			//return factorizeQS(input);
 		}
@@ -118,14 +121,15 @@ public class Factorizer {
 		BigInteger sqrtn = bigSqrt(input);
 		ArrayList<ArrayList<Integer>> factorBase = getLegendrePrimes(input,B);
 		ArrayList<QVectorElement> finalQs = findQs(factorBase,M,sqrtn,input);
-		BitSet[] Qarray = new BitSet[finalQs.size()];
-		for(int i = 0; i < finalQs.size(); i++) {
-			Qarray[i] = finalQs.get(i).getBitSet();
-		}
+		//BitSet[] Qarray = new BitSet[finalQs.size()];
+		//for(int i = 0; i < finalQs.size(); i++) {
+			//Qarray[i] = finalQs.get(i).getBitSet();
+		//}
 		
-		GaussEliminator ge = new GaussEliminator();
-		BitSet[] sol = ge.gaussEliminate(Qarray, Qarray.length, factorBase.size()+1);
-		
+		//GaussEliminator ge = new GaussEliminator();
+		//BitSet[] sol = ge.gaussEliminate(Qarray, Qarray.length, factorBase.size()+1);
+		System.out.println("factors in factor base: " + factorBase.size()); //TODO
+		System.out.println("Final Q size: " + finalQs.size());
 		
 		//Search for solution exponent vectors
 		BitSet variables = new BitSet(c);

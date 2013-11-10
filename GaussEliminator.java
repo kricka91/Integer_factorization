@@ -50,25 +50,27 @@ public class GaussEliminator {
 			//System.err.println("length: " + matrix[i].length());
 		}
 		
-		//System.err.println("You entered the matrix:");
+		System.err.println("You entered the matrix:");
 		printMatrix(matrix, rows, columns);
-		gaussEliminate(matrix, rows, columns);
-		//System.err.println("After Gauss elimination");
+		matrix = gaussEliminate(matrix, rows, columns);
+		System.err.println("After Gauss elimination");
 		printMatrix(matrix, rows, columns);
 		
 		BitSet freeVar = getFreeVariables(matrix, rows, columns);
-		//System.err.println("Free variables: ");
+		System.err.println("Free variables: ");
 		printBitSet(freeVar, columns);
 		
 		BitSet nullspace = null;
 		while (true) {
 			nullspace = calcNullSpace(matrix, rows, columns, freeVar, nullspace);
 			//System.err.println("Null space vector: ");
-			printBitSet(nullspace, columns);
+			//printBitSet(nullspace, columns);
 			if (nullspace.isEmpty()) {
 				break;
 			}
 		}
+		System.err.println("Null space vector: ");
+		printBitSet(nullspace, columns);
 	}
 
 	/**
@@ -129,7 +131,8 @@ public class GaussEliminator {
 		} else {
 			lr = (BitSet)prev.clone();
 			lr.and(free);
-			lastRow = lr.length()-1;
+			//lastRow = lr.length()-1;
+			lastRow = lr.nextSetBit(0);
 			
 			/*
 			if (lastRow == -1) {
@@ -194,7 +197,7 @@ public class GaussEliminator {
 		return variables;
 	}
 	
-	public BitSet[] gaussEliminate(BitSet[] src, int r, int c) {
+	public BitSet[] gaussEliminate(final BitSet[] src, int r, int c) {
 		BitSet[] res;
 		res = (BitSet[])src.clone();	//Use this if you don't want to modify input
 		//res = src;	//Use this if you want to modify the input instead
@@ -204,19 +207,19 @@ public class GaussEliminator {
 		for (int j = 0;j<c;j++) {
 			x = -1;
 			for (int i = j-cNoBit;i<r;i++) {
-				if (src[i].get(j) == true) {
+				if (res[i].get(j) == true) {
 					if (x < 0) {
 						x = i;
 					} else {
-						src[i].xor(src[x]);
+						res[i].xor(res[x]);
 					}
 				}
 			}
 			
 			if (x > -1) {
-				tmp = (BitSet)src[j-cNoBit].clone();
-				src[j-cNoBit] = (BitSet)src[x].clone();
-				src[x] = (BitSet)tmp.clone();
+				tmp = (BitSet)res[j-cNoBit].clone();
+				res[j-cNoBit] = (BitSet)res[x].clone();
+				res[x] = (BitSet)tmp.clone();
 			} else {
 				cNoBit++;
 			}

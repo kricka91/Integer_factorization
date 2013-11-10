@@ -322,6 +322,7 @@ public class Factorizer {
 				}
 			}
 			
+			/*
 			if(possibleFactors[1].compareTo(BigInteger.ONE) == 1) {
 				foundFactors = true;
 				BigInteger rem = input.divide(possibleFactors[1]);
@@ -335,6 +336,7 @@ public class Factorizer {
 				factors.addAll(factorsOfRem);
 				return factors;
 			}
+			*/
 			
 			iter++;
 			//public BigInteger[] getFactors(BitSet factored, ArrayList<QVectorElement> qVector, BigInteger n) {

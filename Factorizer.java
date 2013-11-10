@@ -1,3 +1,4 @@
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 //import java.math.*;
@@ -120,6 +121,10 @@ public class Factorizer {
 		
 		
 		//check if remainder is perfect square
+		//BigDecimal bd = new BigDecimal(rem);
+		//final int maxExponent = 20;
+		
+		
 		
 		
 		if(rem.compareTo(threshHold) <= 0) {

@@ -69,8 +69,8 @@ public class Factorizer {
 				System.err.println("Invalid number format.");
 				return;
 			}
-			System.out.println("Square root is: " + factorizer.longSqrt(input));
-			System.out.println("Cube root is: " + factorizer.longMRoot(input,3));
+			//System.out.println("Square root is: " + factorizer.longSqrt(input));
+			//System.out.println("Cube root is: " + factorizer.longMRoot(input,4));
 			
 			ArrayList<BigInteger> result = factorizer.factorize(input);
 			if(result == null) {
@@ -94,11 +94,14 @@ public class Factorizer {
 		//Some input checking, although Kattis
 		//doesn't give us number smaller than 2
 		if (BigInteger.ONE.equals(input.max(BigInteger.ONE))) {
+			System.err.println(input);
 			System.err.println("Input is smaller than 2...");
 			System.exit(0);
 		}
 		//BigInteger threshHold = BigInteger.valueOf(1000);
 		//factorizeQS(input);
+		
+		//System.out.println(bigMRoot(input,15));
 		
 		//first, remove small factors by trial division.
 		BigInteger rem = input;
@@ -120,16 +123,45 @@ public class Factorizer {
 
 		}
 		
+		if(rem.equals(BigInteger.ONE))
+			return factors;
 		
-
-		//check if remainder is a perfect power
-		//TODO
 
 		//check if remainder is perfect square
-		//BigDecimal bd = new BigDecimal(rem);
-		//final int maxExponent = 20;
-
-		
+		BigDecimal bd = new BigDecimal(rem);
+		final int maxExponent = 30;
+		boolean gotAll = false;
+		int exponent = -1;
+		for(int i = 0; i < primes.length; i++) {
+			int p = primes[i];
+			if(p > maxExponent) {
+				break;
+			}
+			BigInteger root = bigMRoot(rem,p);
+			BigInteger tmp = root.pow(p);
+			if(tmp.equals(rem)) {
+				//found perfect root!
+				exponent = p;
+				rem = root;
+				break;
+			}
+		}
+			
+		if(exponent != -1) {
+			System.err.println("Found exponent: " + exponent);
+			ArrayList<BigInteger> remFactorized = factorize(rem);
+			if(remFactorized == null) {
+				return null;
+			} else {
+				for(int i = 0; i < exponent; i++) {
+					factors.addAll(remFactorized);
+				}
+				return factors;
+			}
+		}
+			
+		if(rem.equals(BigInteger.ONE))
+			return factors;
 		
 		
 		//Check which algorithm is appropriate
@@ -194,8 +226,8 @@ public class Factorizer {
 		BigInteger curNum = input;
 		long sq = longSqrt(input);
 		long l = 0;
-		//
 		for (int i = primes[primes.length-1]; l <= sq;) {
+		//for (int i =0; l <= sq;) {
 			if (i < primes.length) {
 				l = primes[i];
 				i++;
@@ -239,8 +271,8 @@ public class Factorizer {
 		int sqrtNumBits = (numBits-1)/m+1;	//Detta bör fungera
 		BigInteger max = BigInteger.ONE.shiftLeft(sqrtNumBits);
 		BigInteger min = max.shiftRight(1);
-		System.err.println("Min and max are: " + min.toString() + " & " + max.toString());
-		System.err.println("Numbits and sqrtNumBits are: " + numBits + " & " + sqrtNumBits);
+		//System.err.println("Min and max are: " + min.toString() + " & " + max.toString());
+		//System.err.println("Numbits and sqrtNumBits are: " + numBits + " & " + sqrtNumBits);
 		
 		
 		while(max.subtract(min).compareTo(BigInteger.ONE) == 1) {

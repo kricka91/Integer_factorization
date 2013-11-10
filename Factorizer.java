@@ -9,8 +9,6 @@ import java.util.*;
  */
 public class Factorizer {
 	//Fields:
-	private ArrayList<Integer> smallPrimes;	//Hard coded primes
-	
 	//private final static int MAX_B = 500;
 	//private final static int MAX_M = 500;
 	
@@ -35,35 +33,6 @@ public class Factorizer {
 	 * Constructor
 	 */
 	public Factorizer() {
-		smallPrimes = new ArrayList<Integer>();
-		smallPrimes.add(2);
-		smallPrimes.add(3);
-		smallPrimes.add(5);
-		smallPrimes.add(7);
-		smallPrimes.add(11);
-		smallPrimes.add(13);
-		smallPrimes.add(17);
-		smallPrimes.add(19);
-		smallPrimes.add(23);
-		smallPrimes.add(29);
-		smallPrimes.add(31);
-		smallPrimes.add(37);
-		smallPrimes.add(41);
-		smallPrimes.add(43);
-		smallPrimes.add(47);
-		smallPrimes.add(53);
-		smallPrimes.add(59);
-		smallPrimes.add(61);
-		smallPrimes.add(67);
-		smallPrimes.add(71);
-		smallPrimes.add(73);
-		smallPrimes.add(79);
-		smallPrimes.add(83);
-		smallPrimes.add(89);
-		smallPrimes.add(97);
-		smallPrimes.add(101);
-		smallPrimes.add(103);
-		//Add more primes if you wish.
 	}
 
 	/**
@@ -158,9 +127,46 @@ public class Factorizer {
 		BitSet[] sol = ge.gaussEliminate(Qarray, Qarray.length, factorBase.size()+1);
 		
 		
+		//Search for solution exponent vectors
+		BitSet variables = new BitSet(c);
+		variables.set(0,c);
+		BitSet mask = new BitSet(c);
+		BitSet bsTmp = new BitSet(c);
 		
-		
-		
+		//Warning. We assume that the matrix is "high" or square. Might crash otherwise.
+		for(int i = c-1; i >= 0; i--) {	//Lower rows should be all 0 anyway
+			
+			bsTmp = (BitSet)matrix[i].clone();
+			mask.set(i);
+			
+			//Set the variables
+			bsTmp.and(variables);
+			
+			//Check if variable is bound or free
+			mask.and(bsTmp);
+			
+			if (mask.get(i)) {	//Bound
+				//System.err.println("Bound!");
+				//Determine what we need to set it to
+				int bitVal = bsTmp.cardinality();
+				//System.err.println("bitVal is: " + bitVal);
+				bitVal = (bitVal+1) % 2;
+				
+				if (bitVal == 0) {
+					variables.clear(i);
+				} else {
+					variables.set(i);
+				}
+
+			} else {	//Free, set to 1 as default for now
+				//System.err.println("Free!");
+				variables.set(i);
+			}
+			
+		}
+
+
+
 		return null;
 	}
 	
@@ -184,8 +190,8 @@ public class Factorizer {
 		long l = 0;
 		
 		for (int i = 0; l <= sq;) {
-			if (i < smallPrimes.size()) {
-				l = smallPrimes.get(i);
+			if (i < primes.length) {
+				l = primes[i];
 				i++;
 			} else {
 				l+=2;

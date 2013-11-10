@@ -68,7 +68,8 @@ public class Factorizer {
 				System.err.println("Invalid number format.");
 				return;
 			}
-			//System.out.println("Square root is: " + factorizer.longSqrt(input));
+			System.out.println("Square root is: " + factorizer.longSqrt(input));
+			System.out.println("Cube root is: " + factorizer.longMRoot(input,3));
 			
 			ArrayList<BigInteger> result = factorizer.factorize(input);
 			if(result == null) {
@@ -119,9 +120,12 @@ public class Factorizer {
 		}
 		
 		
-		//check if remainder is perfect square
+		//check if remainder is a perfect power
+		//TODO
 		
 		
+		
+		//Check which algorithm is appropriate
 		if(rem.compareTo(threshHold) <= 0) {
 			ArrayList<BigInteger> tmp = factorizeNaive(rem);
 			if(tmp != null)
@@ -215,17 +219,26 @@ public class Factorizer {
 		return result;
 	}
 	
+	
 	/**
-	 * @return The integer square root (BigInteger) of the input value
+	 * @return The integer m-th root (BigInteger) of the input value
 	 */
-	private BigInteger bigSqrt(BigInteger n) {
-		BigInteger min = BigInteger.ONE;
-		BigInteger max = n;
+	private BigInteger bigMRoot(BigInteger n, int m) {
+		//BigInteger min = BigInteger.ONE;
+		//BigInteger max = n;
+		
+		
+		int numBits = n.bitLength();
+		int sqrtNumBits = (numBits-1)/m+1;	//Detta bör fungera
+		BigInteger max = BigInteger.ONE.shiftLeft(sqrtNumBits);
+		BigInteger min = max.shiftRight(1);
+		System.err.println("Min and max are: " + min.toString() + " & " + max.toString());
+		System.err.println("Numbits and sqrtNumBits are: " + numBits + " & " + sqrtNumBits);
 		
 		
 		while(max.subtract(min).compareTo(BigInteger.ONE) == 1) {
 			BigInteger c = max.add(min).shiftRight(1);
-			BigInteger pow = c.pow(2);
+			BigInteger pow = c.pow(m);
 			int comp = pow.compareTo(n);
 			if(comp == 0) {
 				//they are equal
@@ -240,12 +253,19 @@ public class Factorizer {
 		}
 		
 		//now we have a situation where max-min == 1 
-		if(max.pow(2).compareTo(n) < 1) {
+		if(max.pow(m).compareTo(n) < 1) {
 			return max;
 		} else {
 			return min;
 		}
 		//return BigInteger.valueOf(longSqrt(n));
+	}
+	
+	/**
+	 * @return The integer square root (BigInteger) of the input value
+	 */
+	private BigInteger bigSqrt(BigInteger n) {
+		return bigMRoot(n, 2);
 	}
 	
 	/**
@@ -257,19 +277,18 @@ public class Factorizer {
 	 * O(p(b,2)) is the complexity of BigInteger.pow(2), a biginteger with b bits.
 	 */
 	private long longSqrt(BigInteger n) {
-		/*
-		int numBits = n.bitLength();
-		int sqrtNumBits = numBits/2;	//Eller nåt sånt
-		BigInteger max = BigInteger.ONE.shiftLeft(sqrtNumBits+1);
-		BigInteger min = max.shiftRight(1);
-		System.err.println("Min and max are: " + min.toString() + " & " + max.toString());
-		System.err.println("Numbits and sqrtNumBits are: " + numBits + " & " + sqrtNumBits);
-		*/
 		return bigSqrt(n).longValue();
 		
 		//double d = n.doubleValue();
 		//return (long)Math.sqrt(d);
 		//TODO Don't know if this is accurate enough
+	}
+	
+	/**
+	 * @return The integer m-th root (long) of the input value
+	 */
+	private long longMRoot(BigInteger n, int m) {
+		return bigMRoot(n,m).longValue();
 	}
 	
 	/**

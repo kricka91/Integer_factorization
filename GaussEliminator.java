@@ -231,7 +231,7 @@ public class GaussEliminator {
 		}
 	}
 	
-	private void printBitSet(BitSet bs, int c) {
+	public void printBitSet(BitSet bs, int c) {
 		if (bs != null) {
 			for (int j = 0;j<c;j++) {
 				System.err.print(bs.get(j) == true ? 1 : 0);

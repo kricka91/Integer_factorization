@@ -50,20 +50,20 @@ public class GaussEliminator {
 			//System.err.println("length: " + matrix[i].length());
 		}
 		
-		System.err.println("You entered the matrix:");
+		//System.err.println("You entered the matrix:");
 		printMatrix(matrix, rows, columns);
 		gaussEliminate(matrix, rows, columns);
-		System.err.println("After Gauss elimination");
+		//System.err.println("After Gauss elimination");
 		printMatrix(matrix, rows, columns);
 		
 		BitSet freeVar = getFreeVariables(matrix, rows, columns);
-		System.err.println("Free variables: ");
+		//System.err.println("Free variables: ");
 		printBitSet(freeVar, columns);
 		
 		BitSet nullspace = null;
 		while (true) {
 			nullspace = calcNullSpace(matrix, rows, columns, freeVar, nullspace);
-			System.err.println("Null space vector: ");
+			//System.err.println("Null space vector: ");
 			printBitSet(nullspace, columns);
 			if (nullspace.isEmpty()) {
 				break;
@@ -225,7 +225,7 @@ public class GaussEliminator {
 		return res;
 	}
 	
-	private void printMatrix(BitSet[] matrix, int r, int c) {
+	public void printMatrix(BitSet[] matrix, int r, int c) {
 		for (int i = 0;i<r;i++) {
 			printBitSet(matrix[i], c);
 		}

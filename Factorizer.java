@@ -243,12 +243,13 @@ public class Factorizer {
 		int c = factorBase.size()+1;
 		System.err.println("r: " + r + ", c:" + c);
 		ge.printMatrix(Qarray, r, c);
-		Qarray = ge.gaussEliminate(Qarray, r, c);
+		ge.gaussEliminate(Qarray, r, c);
 		System.err.println("-------------");
 		ge.printMatrix(Qarray, r, c);
 		final BitSet free = ge.getFreeVariables(Qarray, r, c);
-		//System.err.println("free:");
-		//ge.printBitSet(free, c);
+		System.err.println("free:");
+		ge.printBitSet(free, c);
+		System.err.println("-------------");
 		boolean foundFactors = false;
 		BitSet sol = null;
 		int maxIters = 50;
@@ -272,10 +273,16 @@ public class Factorizer {
 			sol = ge.calcNullSpace(Qarray, r, c, free, sol);
 			ge.printBitSet(sol, c);
 			
+			if(!isNullSpace(Qarray, sol)) {
+				System.err.println("NOT NULL SPACE");
+			}
+			
 			//System.err.println("2");
 			if(sol.isEmpty()) 
 				break;
 			BigInteger[] possibleFactors = getFactors(sol,finalQs,input);
+			
+			
 			
 			//if(possibleFactors[0].equals(BigInteger.ONE) && possibleFactors[0].equals(BigInteger.ONE)) {
 				//System.err.println("BOTH ARE ONE");
@@ -283,9 +290,10 @@ public class Factorizer {
 			
 			
 			//check results
-			if(possibleFactors[0].compareTo(BigInteger.ONE) == 1) {
+			if(possibleFactors[0].compareTo(BigInteger.ONE) == 1 && !possibleFactors[0].equals(input)) {
 				//wooooh, found factor :)
 				System.err.println("FOUND FACTORS");
+				System.err.println(possibleFactors[0] + " " + possibleFactors[1]);
 				foundFactors = true;
 				BigInteger rem = input.divide(possibleFactors[0]);
 				
@@ -664,6 +672,16 @@ public class Factorizer {
 		factors[1] = x.add(y).gcd(n);
 		
 		return factors;
+	}
+	
+	public boolean isNullSpace(BitSet[] matrix, final BitSet sol) {
+		for(BitSet bs : matrix) {
+			BitSet bsc = (BitSet) bs.clone();
+			bsc.and(sol);
+			if(bsc.length() > 0)
+				return false;
+		}
+		return true;
 	}
 	
 	

@@ -26,7 +26,7 @@ public class Factorizer {
 	private int B;
 	private int M;
 	
-	private BigInteger threshHold = BigInteger.valueOf(1000000);
+	private BigInteger threshHold = new BigInteger("10000000");
 	
 	//Methods
 	/**
@@ -98,8 +98,34 @@ public class Factorizer {
 		//BigInteger threshHold = BigInteger.valueOf(1000);
 		//factorizeQS(input);
 		
-		if(input.compareTo(threshHold) <= 0) {
-			return factorizeNaive(input);
+		//first, remove small factors by trial division.
+		BigInteger rem = input;
+		ArrayList<BigInteger> factors = new ArrayList<BigInteger>();
+		
+		for(int p : primes) {
+			boolean divAll = false;
+			while(!divAll) {
+				BigInteger pbi = BigInteger.valueOf(p);
+				BigInteger[] divr = rem.divideAndRemainder(pbi);
+				if(divr[1].equals(BigInteger.ZERO)) {
+					//found low factor!
+					rem = divr[0];
+					factors.add(pbi);
+				} else {
+					divAll = true;
+				}
+			}
+
+		}
+		
+		
+		
+		if(rem.compareTo(threshHold) <= 0) {
+			ArrayList<BigInteger> tmp = factorizeNaive(rem);
+			if(tmp != null)
+				factors.addAll(tmp);
+			else
+				return null;
 		} else {
 			
 			return null; //TODO
@@ -107,7 +133,7 @@ public class Factorizer {
 		}
 		
 		
-		
+		return factors;
 		//return factorizeNaive(input);
 	}
 	
@@ -131,43 +157,6 @@ public class Factorizer {
 		System.out.println("factors in factor base: " + factorBase.size()); //TODO
 		System.out.println("Final Q size: " + finalQs.size());
 		
-		//Search for solution exponent vectors
-		BitSet variables = new BitSet(c);
-		variables.set(0,c);
-		BitSet mask = new BitSet(c);
-		BitSet bsTmp = new BitSet(c);
-		
-		//Warning. We assume that the matrix is "high" or square. Might crash otherwise.
-		for(int i = c-1; i >= 0; i--) {	//Lower rows should be all 0 anyway
-			
-			bsTmp = (BitSet)matrix[i].clone();
-			mask.set(i);
-			
-			//Set the variables
-			bsTmp.and(variables);
-			
-			//Check if variable is bound or free
-			mask.and(bsTmp);
-			
-			if (mask.get(i)) {	//Bound
-				//System.err.println("Bound!");
-				//Determine what we need to set it to
-				int bitVal = bsTmp.cardinality();
-				//System.err.println("bitVal is: " + bitVal);
-				bitVal = (bitVal+1) % 2;
-				
-				if (bitVal == 0) {
-					variables.clear(i);
-				} else {
-					variables.set(i);
-				}
-
-			} else {	//Free, set to 1 as default for now
-				//System.err.println("Free!");
-				variables.set(i);
-			}
-			
-		}
 
 
 

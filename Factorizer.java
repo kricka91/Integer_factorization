@@ -119,6 +119,8 @@ public class Factorizer {
 		}
 		
 		
+		//check if remainder is perfect square
+		
 		
 		if(rem.compareTo(threshHold) <= 0) {
 			ArrayList<BigInteger> tmp = factorizeNaive(rem);
@@ -181,8 +183,8 @@ public class Factorizer {
 		BigInteger curNum = input;
 		long sq = longSqrt(input);
 		long l = 0;
-		
-		for (int i = 0; l <= sq;) {
+		//
+		for (int i = primes[primes.length-1]; l <= sq;) {
 			if (i < primes.length) {
 				l = primes[i];
 				i++;

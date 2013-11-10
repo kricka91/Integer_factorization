@@ -680,7 +680,7 @@ public class Factorizer {
 		for(BitSet bs : matrix) {
 			BitSet bsc = (BitSet) bs.clone();
 			bsc.and(sol);
-			if(bsc.length() > 0)
+			if(bsc.cardinality() % 2 != 0)
 				return false;
 		}
 		return true;

@@ -27,7 +27,7 @@ public class Factorizer {
 	private int B;
 	private int M;
 	
-	private BigInteger threshHold = new BigInteger("100000000");
+	private BigInteger threshHold = new BigInteger("100000");
 	
 	//Methods
 	/**
@@ -188,8 +188,21 @@ public class Factorizer {
 			else
 				return null;
 		} else {
+			//if(rem.compareTo(new BigInteger("1180591620717411303424")) == 1) { //2^70
+			
+			//if(rem.compareTo(new BigInteger("1208925819614629174706176")) == 1) { //2^80
+			if(rem.compareTo(new BigInteger("151115727451828646838272")) == 1) { //2^77
+			//if(rem.compareTo(new BigInteger("302231454903657293676544")) == 1) { //2^78
+			
+			
+				return null;
+			}
+			
+			
+			
 			System.err.println("Calling factorizeQS with parameter: " + rem);
-			ArrayList<BigInteger> tmp = factorizeQS(rem);
+			//ArrayList<BigInteger> tmp = factorizeQS(rem);
+			ArrayList<BigInteger> tmp = factorizePolRho(rem);
 			if(tmp != null) {
 				factors.addAll(tmp);
 				
@@ -228,7 +241,8 @@ public class Factorizer {
 		ArrayList<QVectorElement> finalQs = findQs(factorBase,M,sqrtn,input);
 		System.err.println("found " + finalQs.size() + " Qs");
 		for(int i = 0; i < finalQs.size(); i++) {
-			System.err.print(finalQs.get(i).getOriginalQ() + " ");
+			//System.err.print(finalQs.get(i).getOriginalQ() + " ");
+			
 		}
 		System.err.println();
 		BitSet[] Qarray = new BitSet[finalQs.size()];
@@ -243,9 +257,9 @@ public class Factorizer {
 		int c = factorBase.size()+1;
 		System.err.println("r: " + r + ", c:" + c);
 		ge.printMatrix(Qarray, r, c);
-		Qarray = ge.gaussEliminate(Qarray, r, c);
+		//Qarray = ge.gaussEliminate(Qarray, r, c);
 		System.err.println("-------------");
-		ge.printMatrix(Qarray, r, c);
+		//ge.printMatrix(Qarray, r, c);
 		final BitSet free = ge.getFreeVariables(Qarray, r, c);
 		System.err.println("free:");
 		ge.printBitSet(free, c);
@@ -271,12 +285,12 @@ public class Factorizer {
 			*/
 			//System.err.println("1");
 			sol = ge.calcNullSpace(Qarray, r, c, free, sol);
-			ge.printBitSet(sol, c);
+			//ge.printBitSet(sol, c);
 			
 			if(!isNullSpace(Qarray, sol)) {
-				System.err.println("NOT NULL SPACE");
+				//System.err.println("NOT NULL SPACE");
 			} else {
-				System.err.println("IN NULL SPACE");
+				//System.err.println("IN NULL SPACE");
 			}
 			
 			//System.err.println("2");
@@ -362,9 +376,47 @@ public class Factorizer {
 	/**
 	 * Factorize an integer using Pollard's rho method
 	 */
-	private ArrayList<BigInteger> factorizePolRho(BigInteger input) {
-		//TODO maybe
-		return null;
+	private ArrayList<BigInteger> factorizePolRho(BigInteger n) {
+		BigInteger x = BigInteger.valueOf(2);
+		BigInteger y = BigInteger.valueOf(2);
+		BigInteger d = BigInteger.valueOf(1);
+		BigInteger z = BigInteger.ONE;
+		
+		int i = 0;
+		while(d.equals(BigInteger.ONE)) {
+			x = rhoF(x,n);
+			y = rhoF(rhoF(y,n),n);
+			//d = x.subtract(y).abs().gcd(n);
+			z = z.multiply(x.subtract(y).abs()).mod(n);
+			i++;
+			if(i == 100) {
+				d = z.gcd(n);
+				i = 0;
+				z = BigInteger.ONE;
+			}
+		}
+		
+		if(d.equals(n)) {
+			return null;
+		} else {
+			//n == d*rem
+			ArrayList<BigInteger> res = new ArrayList<BigInteger>();
+			BigInteger rem = n.divide(d);
+			ArrayList<BigInteger> r1 = factorize(d);
+			ArrayList<BigInteger> r2 = factorize(rem);
+			if(r1 == null || r2 == null) {
+				return null;
+			}
+			res.addAll(r1);
+			res.addAll(r2);
+			return res;
+		}
+		
+		//return null;
+	}
+	
+	private BigInteger rhoF(BigInteger x, BigInteger n) {
+		return x.pow(2).subtract(BigInteger.ONE).mod(n);
 	}
 	
 	/**
@@ -531,7 +583,8 @@ public class Factorizer {
 		//initialize BitSet arraylist
 		ArrayList<QVectorElement> sols = new ArrayList<QVectorElement>();
 		//final int EXTRA_Qs = 10;
-		final int goal = psols.size()+10; //TODO parameters are here!!
+		final int goal = psols.size()+20; //TODO parameters are here!!
+		//final int goal = 431;
 		final int maxIntervals = 30;
 		final BigInteger interSize = BigInteger.valueOf(500);
 		
@@ -672,7 +725,7 @@ public class Factorizer {
 		y = bigSqrt(y);
 		
 		BigInteger[] factors = new BigInteger[2];
-		factors[0] = x.subtract(y).gcd(n);
+		factors[0] = x.subtract(y).abs().gcd(n);
 		factors[1] = x.add(y).gcd(n);
 		
 		return factors;
@@ -684,6 +737,31 @@ public class Factorizer {
 			bsc.and(sol);
 			if(bsc.cardinality() % 2 != 0)
 				return false;
+		}
+		return true;
+	}
+	
+	public boolean controlQ(QVectorElement q,ArrayList<ArrayList<Integer>> factorBase) {
+		if(q.getOriginalQ().compareTo(BigInteger.ZERO) == -1) {
+			if(!q.getBitSet().get(0)) {
+				return false;
+			}
+		} else {
+			if(q.getBitSet().get(0)) {
+				return false;
+			}
+		}
+		
+		BigInteger r = BigInteger.ONE;
+		for(int i = 0; i < factorBase.size(); i++) {
+			int bi = i+1;
+			if(q.getBitSet().get(bi)) {
+				r = r.multiply(BigInteger.valueOf(factorBase.get(i).get(0)));
+			}
+		}
+		
+		if(!r.equals(q.getOriginalQ())) {
+			return false;
 		}
 		return true;
 	}

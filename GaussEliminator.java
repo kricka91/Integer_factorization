@@ -63,14 +63,14 @@ public class GaussEliminator {
 		BitSet nullspace = null;
 		while (true) {
 			nullspace = calcNullSpace(matrix, rows, columns, freeVar, nullspace);
-			//System.err.println("Null space vector: ");
-			//printBitSet(nullspace, columns);
+			System.err.println("Null space vector: ");
+			printBitSet(nullspace, columns);
 			if (nullspace.isEmpty()) {
 				break;
 			}
 		}
-		System.err.println("Null space vector: ");
-		printBitSet(nullspace, columns);
+		//System.err.println("Null space vector: ");
+		//printBitSet(nullspace, columns);
 	}
 
 	/**
@@ -158,14 +158,19 @@ public class GaussEliminator {
 			}
 			
 			variables = (BitSet)prev.clone();
-			variables.set(0,lastRow);
-			variables.clear(lastRow);
+			
+			//if (lastRow > 0) {
+				variables.set(0,lastRow);
+				variables.clear(lastRow);
+			//}
+			
 			//System.err.println("variables is now:");
 			//printBitSet(variables, c);
 			lastRow--;
 		}
 		
 		BitSet bsTmp = new BitSet(c);
+		//System.err.println("lastRow is: " + lastRow);
 		
 		//Warning. We assume that the matrix is "high" or square. Might crash otherwise.
 		for(int i = lastRow; i >= 0; i--) {	//Lower rows should be all 0 anyway
@@ -175,7 +180,7 @@ public class GaussEliminator {
 			bsTmp.and(variables);
 			
 			if (!free.get(i)) {	//Bound
-				//System.err.println("Bound!");
+				//System.err.println("Bound!" + " i is " + i);
 				//Determine what we need to set it to
 				int bitVal = bsTmp.cardinality();
 				//System.err.println("bitVal is: " + bitVal);
@@ -225,6 +230,28 @@ public class GaussEliminator {
 			}
 		}
 		
+		
+		//Rearrange for a nicer diagonal
+		for (int j = c-1;j>=0;j--) {
+			if (res[j].get(j) == true) {	//No rearranging needed.
+				break;
+			}
+			
+			if (res[j].isEmpty()) {	//0-row. Just continue
+				continue;
+			}
+			
+			int bitPos = res[j].nextSetBit(0);
+			
+			tmp = (BitSet)res[j].clone();
+			res[j] = new BitSet(c);
+			res[j].clear();
+			res[bitPos] = (BitSet)tmp.clone();
+			
+		}
+		
+		
+		
 		return res;
 	}
 	
@@ -237,7 +264,7 @@ public class GaussEliminator {
 	public void printBitSet(BitSet bs, int c) {
 		if (bs != null) {
 			for (int j = 0;j<c;j++) {
-				System.err.print(bs.get(j) == true ? 1 : 0);
+				System.err.print(" " + (bs.get(j) == true ? 1 : 0));
 			}
 			System.err.println();
 		} else {

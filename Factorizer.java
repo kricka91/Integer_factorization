@@ -243,7 +243,7 @@ public class Factorizer {
 		int c = factorBase.size()+1;
 		System.err.println("r: " + r + ", c:" + c);
 		ge.printMatrix(Qarray, r, c);
-		ge.gaussEliminate(Qarray, r, c);
+		Qarray = ge.gaussEliminate(Qarray, r, c);
 		System.err.println("-------------");
 		ge.printMatrix(Qarray, r, c);
 		final BitSet free = ge.getFreeVariables(Qarray, r, c);
@@ -275,6 +275,8 @@ public class Factorizer {
 			
 			if(!isNullSpace(Qarray, sol)) {
 				System.err.println("NOT NULL SPACE");
+			} else {
+				System.err.println("IN NULL SPACE");
 			}
 			
 			//System.err.println("2");

@@ -300,13 +300,15 @@ public class Factorizer {
 			
 			
 			
-			//if(possibleFactors[0].equals(BigInteger.ONE) && possibleFactors[0].equals(BigInteger.ONE)) {
-				//System.err.println("BOTH ARE ONE");
-			//}
+			if ((possibleFactors[0].equals(BigInteger.ONE) || possibleFactors[0].equals(input)) &&
+			(possibleFactors[1].equals(BigInteger.ONE) || possibleFactors[1].equals(input))) {
+				System.err.println("BOTH ARE TRIVIAL");
+			}
+			
 			
 			
 			//check results
-			if(possibleFactors[0].compareTo(BigInteger.ONE) == 1 && !possibleFactors[0].equals(input)) {
+			if(possibleFactors[0].compareTo(BigInteger.ONE) == 1 && possibleFactors[0].compareTo(input) == -1) {
 				//wooooh, found factor :)
 				System.err.println("FOUND FACTORS");
 				System.err.println(possibleFactors[0] + " " + possibleFactors[1]);
@@ -338,8 +340,8 @@ public class Factorizer {
 				}
 			}
 			
-			/*
-			if(possibleFactors[1].compareTo(BigInteger.ONE) == 1) {
+			
+			if(possibleFactors[1].compareTo(BigInteger.ONE) == 1 && possibleFactors[1].compareTo(input) == -1) {
 				foundFactors = true;
 				BigInteger rem = input.divide(possibleFactors[1]);
 				ArrayList<BigInteger> factorsOf1 = factorize(possibleFactors[1]);
@@ -352,7 +354,7 @@ public class Factorizer {
 				factors.addAll(factorsOfRem);
 				return factors;
 			}
-			*/
+			
 			
 			iter++;
 			//public BigInteger[] getFactors(BitSet factored, ArrayList<QVectorElement> qVector, BigInteger n) {

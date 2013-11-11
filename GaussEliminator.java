@@ -52,6 +52,37 @@ public class GaussEliminator {
 		
 		System.err.println("You entered the matrix:");
 		printMatrix(matrix, rows, columns);
+		
+		
+		
+		/*
+		matrix = transpose(matrix, rows, columns);
+		System.err.println("After transposition:");
+		printMatrix(matrix, columns, rows);
+		
+		
+		matrix = gaussEliminate(matrix, columns, rows);
+		System.err.println("After Gauss elimination");
+		printMatrix(matrix, columns, rows);
+		
+		BitSet freeVar = getFreeVariables(matrix, columns, rows);
+		System.err.println("Free variables: ");
+		printBitSet(freeVar, rows);
+		
+		BitSet nullspace = null;
+		while (true) {
+			nullspace = calcNullSpace(matrix, columns, rows, freeVar, nullspace);
+			System.err.println("Null space vector: ");
+			printBitSet(nullspace, columns);
+			if (nullspace.isEmpty()) {
+				break;
+			}
+		}
+		//System.err.println("Null space vector: ");
+		//printBitSet(nullspace, columns);
+		*/
+		
+		
 		matrix = gaussEliminate(matrix, rows, columns);
 		System.err.println("After Gauss elimination");
 		printMatrix(matrix, rows, columns);
@@ -71,6 +102,7 @@ public class GaussEliminator {
 		}
 		//System.err.println("Null space vector: ");
 		//printBitSet(nullspace, columns);
+		
 	}
 
 	/**
@@ -108,6 +140,21 @@ public class GaussEliminator {
 		return res;
 	}
 	
+	public BitSet[] transpose(final BitSet[] src, int r, int c) {
+
+		BitSet[] res = new BitSet[c];
+		for (int i = 0;i<c;i++) {
+			res[i] = new BitSet(r);
+		}
+		
+		for (int i = 0;i<c;i++) {
+			for (int j = 0;j<r;j++) {
+				res[i].set(j, src[j].get(i));
+			}
+		}
+		
+		return res;
+	}
 	
 	//Prev denotes the solution given by the previous call to this function
 	//Free denotes the free variables, calculated by getFreeVariables();
@@ -232,6 +279,7 @@ public class GaussEliminator {
 		
 		
 		//Rearrange for a nicer diagonal
+		
 		for (int j = c-1;j>=0;j--) {
 			if (res[j].get(j) == true) {	//No rearranging needed.
 				break;
